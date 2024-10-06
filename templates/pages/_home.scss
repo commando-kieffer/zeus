@@ -1,0 +1,49 @@
+.home {
+    .welcome {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        h1 {
+            font-family: 'MarianneBold';
+            font-size: 72px;
+            background-size: 100%;
+            background-repeat: repeat;
+            color: transparent;
+            background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+            background-clip: text;
+            -webkit-background-clip: text;
+            padding: 5rem 0;
+            @include bkp(lg) {
+                text-align: center;
+                padding: 5rem 1rem;
+                font-size: 56px;
+            }
+        }
+        .sub-welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 25rem;
+            @include bkp(lg) {
+                padding: 0 1rem;
+            }
+            p {
+                font-family: 'MarianneThin';
+                font-size: 24px;
+                padding-bottom: 5rem;
+                text-align: justify;   
+
+                @include bkp(lg) {
+                    font-size: 18px;
+                }
+            }
+            img {
+                width: 500px;
+                margin-bottom: 5rem;
+                @include bkp(sm) {
+                    width: 275px;
+                }
+            }
+        }
+    }
+}

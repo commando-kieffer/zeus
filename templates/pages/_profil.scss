@@ -1,0 +1,208 @@
+.profil {
+	min-height: 85vh;
+	.profil-head {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		padding: 5rem 0;
+		@include bkp(md) {
+			flex-direction: column;
+			gap: 1rem;
+			padding-top: 5rem;
+			padding-bottom: 3rem;
+		}
+		img {
+			border-radius: 50%;
+		}
+		.profil-info {
+			display: flex;
+			flex-direction: column;
+			margin-left: 3rem;
+			@include bkp(md) {
+				justify-content: center;
+				align-items: center;
+				margin: 1rem;
+			}
+			h1 {
+				font-family: 'MarianneBold';
+				font-size: 54px;
+				background-size: 100%;
+				background-repeat: repeat;
+				color: transparent;
+				background-image: linear-gradient(
+					111.4deg,
+					rgba(7, 7, 9, 1) 6.5%,
+					rgba(27, 24, 113, 1) 93.2%
+				);
+				background-clip: text;
+				-webkit-background-clip: text;
+			}
+			h2 {
+				font-family: 'MarianneRegular';
+				font-size: 22px;
+				background-size: 100%;
+				background-repeat: repeat;
+				color: transparent;
+				background-image: linear-gradient(
+					111.4deg,
+					rgba(7, 7, 9, 1) 6.5%,
+					rgba(27, 24, 113, 1) 93.2%
+				);
+				background-clip: text;
+				-webkit-background-clip: text;
+				text-align: center;
+			}
+			.troop-bordee {
+				display: flex;
+				flex-direction: row;
+				gap: 1rem;
+				margin-top: 1rem;
+			}
+		}
+	}
+	.profil-stats {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		gap: 3rem;
+		@include bkp(md) {
+			flex-direction: column;
+			gap: 1rem;
+		}
+		.ps-data {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			font-family: 'MarianneThin';
+			font-size: 16px;
+			p {
+				padding: 0.5rem;
+			}
+		}
+	}
+	.profil-metier {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		h3 {
+			font-family: 'MarianneRegular';
+			font-size: 2rem;
+			padding-top: 3rem;
+			padding-bottom: 3.5rem;
+		}
+		.pm-container {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			gap: 1rem;
+			@include bkp(sm) {
+				flex-direction: column;
+			}
+		}
+	}
+
+	.profil-points-histo {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		h3 {
+			font-family: 'MarianneRegular';
+			font-size: 2rem;
+			padding-top: 3rem;
+			padding-bottom: 3.5rem;
+		}
+		.pm-container {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			@include bkp(sm) {
+				flex-direction: column;
+			}
+
+			.table {
+				margin: 0 auto;
+				text-align: center;
+				max-width: 90vw;
+				display: grid;
+				grid-template-columns: repeat(4, auto);
+				background-color: rgba(33, 33, 33, 0.02);
+				border-radius: 5px;
+                overflow-x: auto;
+
+				.trow {
+					display: contents;
+				}
+
+				.tdata {
+					padding: 1rem 2rem;
+					font-size: 1.2rem;
+					display: inline-block;
+                    min-width: max-content;
+				}
+
+				.thead.trow .tdata {
+					border-bottom: 1px solid #33333380;
+				}
+
+				.tbody.trow .tdata {
+					border-bottom: 1px solid rgba(133, 133, 133, 0.2);
+				}
+			}
+		}
+	}
+
+	.profil-medaille {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		margin: 0 10rem;
+		@include bkp(md) {
+			margin: 0 5rem;
+			@include bkp(sm) {
+				margin: 0 2rem;
+			}
+		}
+		h3 {
+			font-family: 'MarianneRegular';
+			font-size: 2rem;
+			padding-top: 3rem;
+			padding-bottom: 2rem;
+		}
+		.pm-container {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: flex-start;
+			flex-wrap: wrap;
+			gap: 1rem;
+			.pm-sub {
+				display: flex;
+				flex-direction: column;
+				max-width: 5rem;
+				gap: 1rem;
+				h4 {
+					font-family: 'MarianneThin';
+					font-size: 10px;
+					min-height: 5rem;
+					padding-top: 3rem;
+				}
+				img {
+					width: 50px;
+				}
+				h5 {
+					font-family: 'MarianneThin';
+					font-size: 8px;
+				}
+			}
+		}
+	}
+}

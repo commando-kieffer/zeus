@@ -1,0 +1,20 @@
+/* Base */ 
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    list-style: none;
+}
+
+main {
+    background-image: radial-gradient( circle 993px at 0.5% 50.5%,  rgba(137,171,245,0.37) 0%, rgba(245,247,252,1) 100.2% );
+    padding-bottom: 2rem;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    @include prefix('width', 100%);
+    @include prefix('height', 100%);
+}

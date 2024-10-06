@@ -1,0 +1,82 @@
+.training {
+    .training-form {
+        .tf-head, .tf-content, .tf-foot {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .tf-head {
+            h1 {
+                font-family: 'MarianneBold';
+                font-size: 54px;
+                background-size: 100%;
+                background-repeat: repeat;
+                color: transparent;
+                background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+                background-clip: text;
+                -webkit-background-clip: text;
+                padding: 5rem 0;
+                @include bkp(lg) {
+                    text-align: center;
+                }
+            }
+            .tf-sub {
+                display: flex;
+                flex-direction: row;
+                gap: 2rem;
+                @include bkp(sm) {
+                    flex-direction: column;
+                    gap: 0;
+                }
+                input {
+                    border-radius: 5px 5px 0 0;
+                    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+                    margin-bottom: 4rem;
+                }
+            }
+        }
+        .tf-content {
+            display: flex;
+            flex-flow: row wrap;
+            align-items: flex-start;
+            gap: 2rem;
+            .tfc-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-height: 1012px;
+                border-radius: 5px;
+                padding: 1.5rem;
+                box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+                .badge {
+                    margin: 1rem;
+                }
+                table {
+                    tr {
+                        th {
+                            font-family: 'MarianneBold';
+                            font-size: 16px;
+                        }
+                        td {
+                            text-align: center;
+                            min-width: 100px;
+                            font-family: 'MarianneThin';
+                            font-size: 14px;
+                            img {
+                                height: 45px;
+                            }
+                            input {
+                                min-width: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .tf-foot {
+            padding-top: 4rem;
+            padding-bottom: 2rem;
+        }
+    }
+}

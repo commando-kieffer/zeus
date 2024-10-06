@@ -1,0 +1,129 @@
+header {
+    background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+    .header-top {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        padding: 1rem;
+        .ht-left {
+            flex: 1 1 0;
+        }
+        .ht-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 2 1 0;
+            img {
+                height: 100px;
+                @include bkp(lg) {
+                    height: 100px;
+                }
+            }
+        }
+        .ht-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1 1 0;
+
+            @include bkp(lg) {
+                padding-top: 1rem;
+            }
+            .profil-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                padding: 0.5rem 1.75rem;
+                background-image: radial-gradient( circle 993px at 0.5% 50.5%,  rgba(137,171,245,0.37) 0%, rgba(245,247,252,1) 100.2% );
+                border-radius: 7px;
+                @include bkp(lg) {
+                    background-image: none;
+                }
+                .mobile {
+                    display: none;
+                    @include bkp(lg) {
+                        display: flex;
+                        width: 25px;
+                        height: 25px;
+                    }
+                }
+                .pc-left {
+                    color: #FFFFFF;
+                    margin-right: 1.5rem;
+                    font-family: 'MarianneThin';
+                    font-size: 12px;
+                    a {
+                        font-family: 'MarianneThin';
+                        font-size: 12px;
+                        color: gainsboro;
+                        &:hover {
+                            color: #FFFFFF;
+                        }
+                    }
+                    @include bkp(lg) {
+                        display: none;
+                    }
+                }
+                .pc-right {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: center;
+                    align-items: center;
+                    img {
+                        border-radius: 50%;
+                    }
+                    @include bkp(lg) {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+    nav {
+        border-top: 1px solid #FFFFFF;
+        @include bkp(lg) {
+            overflow-x: scroll;
+        }
+        ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem;
+            @include bkp(lg) {
+                justify-content: flex-start;
+            }
+            li {
+                p {
+                    font-family: 'MarianneThin';
+                    font-size: 14px;
+                    color: gainsboro;
+                    &:hover {
+                        color: #FFFFFF;
+                        cursor: pointer;
+                    }
+                }
+                a {
+                    font-family: 'MarianneThin';
+                    font-size: 14px;
+                    color: gainsboro;
+                    &:hover {
+                        color: #FFFFFF;
+                        border-bottom: 1px solid #FFFFFF;
+                    }
+                }
+                @include bkp(lg) {
+                    white-space: nowrap;
+                    padding-right: 1rem;                
+                }
+            }
+        }
+    }
+    .sub {
+        display: none;
+        border-top: 1px solid rgba(133, 133, 133, 0.493);
+        background-image: linear-gradient( 111.4deg,  rgb(39, 39, 41) 6.5%, rgb(13, 11, 51) 93.2% );
+    }
+}

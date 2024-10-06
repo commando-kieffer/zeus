@@ -1,0 +1,58 @@
+.connection {
+    height: 100vh;
+    background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .login-form {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 2rem;
+        .head-form {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-evenly;
+            @include bkp(md) {
+                flex-flow: column nowrap;
+            }
+            .left-form {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                img {
+                    height: 175px;
+                }
+            }
+            .right-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+                .zeus {
+                    width: 5rem;
+                    height: auto;
+                    padding: 1rem;
+                }
+                .input {
+                    display: flex;
+                    flex-direction: column;
+                    color: #FFFFFF;
+                }
+                button {
+                    margin-top: 1rem;
+                }
+            }
+        }
+        .foot-form {
+            font-family: 'MarianneThin';
+            font-size: 12px;
+            color: #FFFFFF;
+            padding: 1rem 2rem;
+            border-top: 1px solid #FFFFFF;
+            @include bkp(md) {
+                max-width: 250px;
+                text-align: center;   
+            }
+        }
+    }
+}

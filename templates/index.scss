@@ -1,0 +1,26 @@
+/* Index pour la compilation */
+
+// Importation de base.
+@import 'variables';
+@import 'mixins';
+@import 'fonts';
+@import 'base';
+
+// Importation des éléments.
+@import 'elements/input';
+@import 'elements/label';
+@import 'elements/button';
+@import 'elements/badge';
+@import 'elements/tcolor';
+@import 'elements/select';
+
+
+// Importation des pages.
+@import 'pages/connection';
+@import 'pages/home';
+@import 'pages/profil';
+@import 'pages/training';
+
+// Importation des composants.
+@import 'components/header';
+@import 'components/footer';
