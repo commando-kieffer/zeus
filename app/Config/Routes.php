@@ -33,3 +33,4 @@ $routes->post('/points/add_blame', 'Training::add_blame');
 $routes->post('/points/add_work', 'Training::add_work');
 $routes->post('/points/add_warning', 'Training::add_warning');
 $routes->post('/points/modify_training_presence', 'Training::modify_training_presence');
+

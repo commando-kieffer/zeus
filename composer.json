@@ -61,6 +61,6 @@
     },
     "scripts": {
         "test": "phpunit",
-		"build": "vendor/bin/pscss --style=compressed templates/index.scss public/index.css"
+        "build": "vendor/bin/pscss --style=compressed templates/index.scss public/index.css"
     }
 }
