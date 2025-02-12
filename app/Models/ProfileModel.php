@@ -22,9 +22,9 @@ class ProfileModel extends Model
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 0,
-            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
-                'XF-Api-User: ' . session('user')['user_id'],
+                'XF-Api-User: 7', // Avec l'ID du commandant, pour avoir accès à des champs restreints (ex : groupes) aux utilisateurs non-admin
                 'XF-Api-Key: ' . env("XEN_API_KEY"),
             ),
         ));
@@ -41,8 +41,8 @@ class ProfileModel extends Model
         curl_close($curl);
         
         $data = json_decode($response, true);
-
-        if (empty($data["errors"]) && $data["success"])
+    
+        if (empty($data["errors"]) && !empty($data["user"]))
             return $data["user"];
     
         return [];

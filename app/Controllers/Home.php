@@ -58,6 +58,10 @@ class Home extends BaseController
             }
         }
 
+        if (empty($user["avatar_urls"]["l"])) {
+          $user["avatar_urls"]["l"] = "https://zeus.commandokieffer.com/pictures/medailles/beret_vert.jpg";
+        }
+
         $profil = [
             'grade' => $profil_model->get_profil_title($user['user_group_id']),
             'stats' => $profil_model->get_profil_stats($user['user_id']),
