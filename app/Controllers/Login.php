@@ -16,7 +16,7 @@ class Login extends BaseController
     public function api_login()
 	{
         $api_user_model = model(ApiUserModel::class);
-		$api_user_model->api_login($_POST['nickname'], $_POST['password']);
+        $api_user_model->api_login($_POST['nickname'], $_POST['password']);
 
         $route = session('after_login_url') ?? '';
         session()->remove('after_login_url');
