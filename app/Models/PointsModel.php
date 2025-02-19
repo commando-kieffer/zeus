@@ -129,7 +129,7 @@ class PointsModel extends Model
     public function get_history(int $user_id, int $page = 0)
     {
         $skip = 10 * $page;
-        $query = "SELECT category_id, points, message, date FROM panel_points_histo WHERE user_id = $user_id ORDER BY date DESC LIMIT 10 OFFSET $skip";
+        $query = "SELECT category_id, points, message, date FROM panel_points_hist WHERE user_id = $user_id ORDER BY date DESC LIMIT 10 OFFSET $skip";
         $result = $this->db->query($query);
 
         $hist = [];
@@ -166,11 +166,12 @@ class PointsModel extends Model
         $query = "UPDATE xf_user SET panel_pts = panel_pts + 20, panel_prs = panel_prs + 1 WHERE user_id = ?";
         $this->db->query($query, array($member_id));
 
-        $query = "INSERT INTO panel_points_histo (user_id, category_id, points, message) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Training->value,
             20,
+            session("user")["user_id"],
             'Présence pour ' . $training["title"] . ' du ' . $training["date"]
         ]);
     }
@@ -180,25 +181,29 @@ class PointsModel extends Model
         $query = "UPDATE xf_user SET panel_pts = panel_pts - 5, panel_abs = panel_abs + 1 WHERE user_id = ?";
         $this->db->query($query, array($member_id));
 
-        $query = "INSERT INTO panel_points_histo (user_id, category_id, points, message) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Training->value,
             -5,
+            session("user")["user_id"],
             'Absence pour ' . $training["title"] . ' du ' . $training["date"]
         ]);
     }
 
     public function set_point($value, $member_id)
     {
+        if ($value == 0) return;
+
         $query = "UPDATE xf_user SET panel_pts = panel_pts + ? WHERE user_id = ?";
         $this->db->query($query, array($value, $member_id));
 
-        $query = "INSERT INTO panel_points_histo (user_id, category_id, points) VALUES (?, ?, ?)";
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by) VALUES (?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Correction->value,
-            $value
+            $value,
+            session("user")["user_id"]
         ]);
     }
 
@@ -207,11 +212,12 @@ class PointsModel extends Model
         $query = "UPDATE xf_user SET panel_pts = panel_pts - 75 WHERE user_id = ?";
         $this->db->query($query, array($member_id));
 
-        $query = "INSERT INTO panel_points_histo (user_id, category_id, points) VALUES (?, ?, ?)";
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by) VALUES (?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Blame->value,
-            -75
+            -75,
+            session("user")["user_id"]
         ]);
     }
 
@@ -220,11 +226,12 @@ class PointsModel extends Model
         $query = "UPDATE xf_user SET panel_pts = panel_pts - 45 WHERE user_id = ?";
         $this->db->query($query, array($member_id));
 
-        $query = "INSERT INTO panel_points_histo (user_id, category_id, points) VALUES (?, ?, ?)";
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by) VALUES (?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Warning->value,
-            -45
+            -45,
+            session("user")["user_id"]
         ]);
     }
 
@@ -233,11 +240,12 @@ class PointsModel extends Model
         $query = "UPDATE xf_user SET panel_pts = panel_pts + 25 WHERE user_id = ?";
         $this->db->query($query, array($member_id));
 
-        $query = "INSERT INTO panel_points_histo (user_id, category_id, points) VALUES (?, ?, ?)";
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by) VALUES (?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Work->value,
-            25
+            25,
+            session("user")["user_id"]
         ]);
     }
 

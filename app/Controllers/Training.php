@@ -51,8 +51,15 @@ class Training extends BaseController
         $active_members = $points_model->get_active_members();
 
         foreach($active_members as $member) {
-            if (isset($_POST[$member->user_id]))
-                $points_model->set_point($_POST[$member->user_id], $member->user_id);
+          if (!isset($_POST[$member->user_id])) continue;
+
+          $points = $_POST[$member->user_id];
+          if (!is_numeric($points)) continue;
+
+          $points = intval($points);
+          if ($points === 0) continue;
+    
+          $points_model->set_point($points, $member->user_id);
         }
 
         return redirect('operation_success');
