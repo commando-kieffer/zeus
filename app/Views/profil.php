@@ -73,7 +73,7 @@
                 <div class="pm-sub">
                     <h4><?php echo $medaille[0]->title ?></h4>
                     <img src="/pictures/medailles/<?php echo $medaille[0]->name ?>.jpg" alt="#">
-                    <h5><?php echo $medaille[0]->description ?></h5>
+                    <p><?php echo $medaille[0]->description ?></p>
                 </div>
             <?php } ?>
         </div>
