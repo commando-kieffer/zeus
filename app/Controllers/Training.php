@@ -20,7 +20,7 @@ class Training extends BaseController
     }
     
     public function add_training()
-	{
+    {
         $points_model = model(PointsModel::class);
 
         $points_model->set_new_training($_POST['title'], $_POST['date']);
@@ -42,7 +42,7 @@ class Training extends BaseController
         }
 
         return redirect('operation_success');
-	}
+    }
 
     public function add_correct_point()
     {

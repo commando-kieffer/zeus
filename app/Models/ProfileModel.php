@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 use \Config\Database;
+use PhpParser\Node\Expr\Cast\Object_;
 
 class ProfileModel extends Model
 {
@@ -169,7 +170,7 @@ class ProfileModel extends Model
         if (empty($metier_list)) {
             $metier = [
                 'group_id' => null,
-                'metier_title' => "Pas encore ? Cela doit être une erreur... Hop, hop, hop ! Manifeste toi !",
+                'metier_title' => (object) (['title' => "Pas encore ? Cela doit être une erreur... Hop, hop, hop ! Manifeste toi !"]),
             ];
             array_push($metier_list, $metier);
         }

@@ -44,6 +44,7 @@ class Home extends BaseController
         $profil_model = model(ProfileModel::class);
         $points_model = model(PointsModel::class);
         $user = session("user");
+        $is_own_profile = $user_id === -1;
 
         if ($user_id != -1) {
             $user = $profil_model->get_user_profile($user_id);
@@ -75,6 +76,7 @@ class Home extends BaseController
         return view('generic/head')
             . view('generic/header')
             . view('profil', [
+                'is_own_profile' => $is_own_profile,
                 'user' => $user,
                 'profil' => $profil,
                 'points_history' => $points_history
@@ -86,7 +88,7 @@ class Home extends BaseController
     public function training()
     {
         $points_model = model(PointsModel::class);
-
+        
         $members = $points_model->get_active_members_by_troop($points_model->get_active_members());
 
         return view('generic/head')

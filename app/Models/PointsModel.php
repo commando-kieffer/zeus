@@ -30,6 +30,34 @@ class PointsModel extends Model
         return $members;
     }
 
+    public function reparer_les_betises(int $operation_id)
+    {
+      $query = "SELECT * FROM panel_operation WHERE id = " . $operation_id;
+      if ($this->query($query)->getNumRows() < 1) return;
+
+      $active_members = $this->get_active_members();
+      $query = "SELECT DISTINCT id_user from panel_historique WHERE id_operation = " . $operation_id;
+      $presents = array_map(fn($row) => $row["id_user"], $this->db->query($query)->getResultArray());
+
+      foreach ($active_members as $member) {
+        $query = "";
+        if (in_array($member->user_id, $presents)) {
+          $query = "UPDATE xf_user SET panel_pts = panel_pts - 20, panel_prs = panel_prs - 1 WHERE user_id = ?";
+        }
+        else {
+          $query = "UPDATE xf_user SET panel_pts = panel_pts + 5, panel_abs = panel_abs - 1 WHERE user_id = ?";
+        }
+
+        $this->db->query($query, array($member->user_id));
+      }
+
+      $query = "DELETE FROM panel_operation WHERE id = " . $operation_id;
+      $this->db->query($query);
+
+      $query = "DELETE FROM panel_historique WHERE id_operation = " . $operation_id;
+      $this->db->query($query);
+    }
+
     public function get_active_members_by_troop($members_list)
     {
         $troop_ref_id = [38, 39, 40, 41, 45, 46];

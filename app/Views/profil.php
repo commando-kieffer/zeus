@@ -35,7 +35,7 @@
         <div class="pm-container">
             <?php foreach ($profil['metiers'] as $metier) { ?>
 
-                <div class="badge badgemetier"><?php echo $metier['metier_title']->title ?></div>
+                <div class="badge badgemetier"><?php echo $metier['group_id'] !== NULL || $is_own_profile ?  $metier['metier_title']->title : "Pas de métier" ?></div>
 
             <?php } ?>
         </div>
