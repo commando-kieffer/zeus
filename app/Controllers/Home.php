@@ -21,9 +21,13 @@ class Home extends BaseController
 
     public function index(): string
     {
+        $points_model = model(PointsModel::class);
+
+        $members = $points_model->get_active_members_by_troop($points_model->get_active_members_with_points());
+
         return view('generic/head')
             . view('generic/header')
-            . view('home')
+            . view('home',  ['members' => $members])
             . view('generic/footer')
             . view('generic/foot');
     }
@@ -88,7 +92,7 @@ class Home extends BaseController
     public function training()
     {
         $points_model = model(PointsModel::class);
-        
+
         $members = $points_model->get_active_members_by_troop($points_model->get_active_members());
 
         return view('generic/head')

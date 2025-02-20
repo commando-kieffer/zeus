@@ -69,13 +69,18 @@
     <div class="profil-medaille">
         <h3>Les Médailles</h3>
         <div class="pm-container">
-            <?php foreach ($profil['medailles'] as $medaille) { ?>
+      <?php
+        if (empty($profil['medailles'])) {
+          echo "Pas encore de médailles";
+        } else {
+          foreach ($profil['medailles'] as $medaille) {
+      ?>
                 <div class="pm-sub">
                     <h4><?php echo $medaille[0]->title ?></h4>
                     <img src="/pictures/medailles/<?php echo $medaille[0]->name ?>.jpg" alt="#">
                     <p><?php echo $medaille[0]->description ?></p>
                 </div>
-            <?php } ?>
+            <?php } } ?>
         </div>
     </div>
 </main>

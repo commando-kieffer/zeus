@@ -193,14 +193,6 @@ class ProfileModel extends Model
             array_push($medals_list, $result->getResult());
         }
 
-        if (empty($medals_list)) {
-            $medals_list = [
-                'name' => "Pas encore de médaille ?",
-                'title' => "aucune",
-                'description' => "La gloire ne saurait tarder ;)",
-            ];
-        }
-
         return $medals_list;
     }
 }

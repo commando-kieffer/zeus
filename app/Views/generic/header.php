@@ -21,6 +21,7 @@
     </div>
     <nav>
         <ul>
+            <li><a href="/">Accueil</a></li>
             <li><a href="/profil">Mon profil</a></li>
             <li><a href="/">Salle des cartes</a></li>
             <?php if (session("user")['is_staff']) { ?>

@@ -1,9 +1,33 @@
 <main class="home">
-    <div class="welcome">
+    <section class="welcome">
         <h1>Bienvenue sur Zeus</h1>
-        <div class="sub-welcome">
-            <p>Découvrez la puissance entre vos mains avec notre application de commando révolutionnaire, Zeus. Conçue spécialement pour les membres de l'élite, Zeus offre une expérience incomparable en matière de gestion de profils et d'accès à la salle des cartes de TRP. Notre application Zeus simplifie votre vie de commando en vous permettant de consulter rapidement et facilement toutes les informations essentielles dont vous avez besoin pour vos missions critiques.</p>
-            <img src="/pictures/iphone.png" alt="">
-        </div>
-    </div>
+    </section>
+
+    <section class="barracks-container">
+      <div class="content">
+          <?php foreach ($members as $troop) { if(!empty($troop['members'])) { ?>
+          <div class="container">
+              <div class="badge badge<?php echo $troop['id'] ?>"><?php echo $troop['title']; ?></div>
+              <table>
+                  <tr>
+                      <th>Nom</th>
+                      <th>Grade</th>
+                      <th>Points</th>
+                      <th>Présences</th>
+                      <th>Absences</th>
+                  </tr>
+                  <?php foreach($troop['members'] as $member) { ?>
+                  <tr class="member" onclick="window.location.href = '/profil/<?php echo $member->user_id ?>'">
+                      <td><?php echo $member->username ?></td>
+                      <td><img src="/pictures/jackets/<?php echo $member->user_group_id ?>.png" alt=""></td>
+                      <td><?php echo $member->panel_pts ?></td>
+                      <td><?php echo $member->panel_prs ?></td>
+                      <td><?php echo $member->panel_abs ?></td>
+                  </tr>
+                  <?php } ?>
+              </table>
+          </div>
+          <?php }} ?>
+      </div>
+    </section>
 </main>

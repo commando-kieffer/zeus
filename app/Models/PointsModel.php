@@ -30,6 +30,22 @@ class PointsModel extends Model
         return $members;
     }
 
+    public function get_active_members_with_points()
+    {
+        $members = [];
+
+        $query = "SELECT username, user_group_id, secondary_group_ids, user_id, panel_pts, panel_prs, panel_abs FROM xf_user ORDER BY user_order ASC, user_group_id DESC";
+        $result = $this->db->query($query);
+
+        foreach ($result->getResult() as $member) {
+            if ($member->user_group_id >= 5 && $member->user_group_id <= 20 || $member->user_group_id == 50 || $member->user_group_id == 54) {
+                array_push($members, $member);
+            }
+        }
+
+        return $members;
+    }
+
     public function reparer_les_betises(int $operation_id)
     {
       $query = "SELECT * FROM panel_operation WHERE id = " . $operation_id;
