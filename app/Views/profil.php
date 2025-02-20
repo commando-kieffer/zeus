@@ -27,7 +27,7 @@
         </div>
         <div class="ps-data">
             <h3>Taux de présence</h3>
-            <p><?php echo ceil(100 * $profil['stats']->panel_prs / ($profil['stats']->panel_abs + $profil['stats']->panel_prs)) . "%" ?></p>
+            <p><?php echo $profil['stats']->panel_prs + $profil['stats']->panel_abs == 0 ? "0%" : ceil(100 * $profil['stats']->panel_prs / ($profil['stats']->panel_abs + $profil['stats']->panel_prs)) . "%" ?></p>
         </div>
     </div>
     <div class="profil-metier">
