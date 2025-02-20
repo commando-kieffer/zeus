@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="fr">
     <head>
-        <meta name="author" content="Vinat (2018)">
+        <meta name="author" content="Commando Kieffer">
         <meta name="copyright" content="Commando Kieffer 2004">
         <meta name="description" content="Application Zeus du Commando Kieffer 2004">
         <meta name="viewport" content="initial-scale=1, viewport-fit=cover, width=device-width"></meta>
