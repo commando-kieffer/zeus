@@ -2,7 +2,7 @@
     <?php if (empty($operations)) { ?>
     <div class="tf-head">
         <h1>Rapport de présence</h1>
-        <p>Aucune opération n'est en attente d'un rapport pour votre troupe.</p>
+        <p>Aucune opération n'est en attente d'un rapport pour votre troop.</p>
     </div>
     <?php } else { ?>
     <form action="#" class="training-form" id="select-operation-form">

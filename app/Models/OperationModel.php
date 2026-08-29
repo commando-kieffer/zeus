@@ -59,7 +59,7 @@ class OperationModel extends Model
     }
 
     /**
-     * Détermine la troupe d'un membre à partir de ses secondary_group_ids
+     * Détermine la troop d'un membre à partir de ses secondary_group_ids
      * (tableau, comme fourni par la session utilisateur XenForo).
      */
     public function get_member_troop_id($secondary_group_ids)
@@ -85,7 +85,7 @@ class OperationModel extends Model
     }
 
     /**
-     * Opérations pour lesquelles la troupe donnée n'a pas encore de rapport.
+     * Opérations pour lesquelles la troop donnée n'a pas encore de rapport.
      */
     public function get_pending_operations_for_troop(array $member_ids)
     {

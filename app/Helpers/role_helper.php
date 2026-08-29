@@ -2,7 +2,7 @@
 
 /**
  * Rôles dérivés des groupes XenForo de l'utilisateur.
- * user_group_id (primaire) : 8 = QM2, 9 = QM1 (quartier-maîtres, chefs de troupe) ;
+ * user_group_id (primaire) : 8 = QM2, 9 = QM1 (quartier-maîtres, chefs de troop) ;
  * 10-20 ou 50 : état-major ; 17-20 ou 50 : officiers (sous-ensemble de l'état-major).
  * secondary_group_ids (tableau) : 55 = scénariste.
  */
@@ -36,7 +36,7 @@ if (!function_exists('is_scenario_maker')) {
 }
 
 /**
- * Peut créer une opération : scénaristes et état-major (pas les simples chefs de troupe).
+ * Peut créer une opération : scénaristes et état-major (pas les simples chefs de troop).
  */
 if (!function_exists('can_create_operations')) {
     function can_create_operations(array $user): bool
@@ -46,8 +46,8 @@ if (!function_exists('can_create_operations')) {
 }
 
 /**
- * Peut rédiger un rapport de présence pour sa troupe et consulter le rapport
- * complet d'une opération : chefs de troupe et état-major.
+ * Peut rédiger un rapport de présence pour sa troop et consulter le rapport
+ * complet d'une opération : chefs de troop et état-major.
  */
 if (!function_exists('is_squad_or_team_leader')) {
     function is_squad_or_team_leader(array $user): bool

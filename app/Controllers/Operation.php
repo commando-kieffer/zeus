@@ -30,8 +30,8 @@ class Operation extends BaseController
     }
 
     /**
-     * Récupère la troupe (titre + membres actifs) de l'utilisateur courant,
-     * ou null si celui-ci n'appartient à aucune troupe connue.
+     * Récupère la troop (titre + membres actifs) de l'utilisateur courant,
+     * ou null si celui-ci n'appartient à aucune troop connue.
      */
     private function get_own_troop($user)
     {
@@ -164,7 +164,7 @@ class Operation extends BaseController
 
         $troop = $this->get_own_troop($user);
         if ($troop === null) {
-            return $this->render_message("Vous n'êtes rattaché à aucune troupe, vous ne pouvez donc pas rédiger de rapport.");
+            return $this->render_message("Vous n'êtes rattaché à aucune troop, vous ne pouvez donc pas rédiger de rapport.");
         }
 
         $operation_model = model(OperationModel::class);
@@ -193,12 +193,12 @@ class Operation extends BaseController
 
         $troop = $this->get_own_troop($user);
         if ($troop === null) {
-            return $this->render_message("Vous n'êtes rattaché à aucune troupe, vous ne pouvez donc pas rédiger de rapport.");
+            return $this->render_message("Vous n'êtes rattaché à aucune troop, vous ne pouvez donc pas rédiger de rapport.");
         }
 
         $member_ids = array_map(fn($member) => $member->user_id, $troop['members']);
         if ($operation_model->has_troop_reported($operation_id, $member_ids)) {
-            return $this->render_message("Un rapport a déjà été soumis pour votre troupe pour cette opération.");
+            return $this->render_message("Un rapport a déjà été soumis pour votre troop pour cette opération.");
         }
 
         return view('generic/head')
@@ -223,12 +223,12 @@ class Operation extends BaseController
 
         $troop = $this->get_own_troop($user);
         if ($troop === null) {
-            return $this->render_message("Vous n'êtes rattaché à aucune troupe, vous ne pouvez donc pas rédiger de rapport.");
+            return $this->render_message("Vous n'êtes rattaché à aucune troop, vous ne pouvez donc pas rédiger de rapport.");
         }
 
         $member_ids = array_map(fn($member) => $member->user_id, $troop['members']);
         if ($operation_model->has_troop_reported($operation_id, $member_ids)) {
-            return $this->render_message("Un rapport a déjà été soumis pour votre troupe pour cette opération.");
+            return $this->render_message("Un rapport a déjà été soumis pour votre troop pour cette opération.");
         }
 
         $operation_array = (array) $operation;
@@ -245,7 +245,7 @@ class Operation extends BaseController
     }
 
     /**
-     * Correction du rapport complet d'une opération (toutes troupes confondues),
+     * Correction du rapport complet d'une opération (toutes troops confondues),
      * réservée aux officiers. Seules les cases modifiées par rapport à l'état
      * actuel entraînent une écriture (rapport + compteurs + historique de points).
      */
