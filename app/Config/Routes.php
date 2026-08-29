@@ -31,6 +31,7 @@ $routes->get('/operations/report', 'Operation::report');
 $routes->get('/operations/report/(:num)', 'Operation::report_form/$1');
 $routes->get('/operations/(:num)', 'Operation::show/$1');
 $routes->get('/upload/galerie', 'Upload::gallery');
+$routes->get('/medals', 'Medal::index');
 
 $routes->post('/login', 'Login::api_login');
 $routes->post('/points/add_correct_point', 'Training::add_correct_point');
@@ -42,4 +43,5 @@ $routes->post('/operations/create', 'Operation::store');
 $routes->post('/operations/report/(:num)', 'Operation::submit_report/$1');
 $routes->post('/operations/(:num)/update_report', 'Operation::update_report/$1');
 $routes->post('/upload/galerie', 'Upload::store_gallery');
+$routes->post('/medals/toggle', 'Medal::toggle');
 

@@ -32,9 +32,9 @@
                 <li>
                     <p id="points">Points</p>
                 </li>
-                <li><a href="#">Décorations</a></li>
             <?php } ?>
             <?php if (is_team_leader($current_user)) { ?>
+                <li><a href="/medals">Décorations</a></li>
                 <li>
                     <p id="upload-menu">Upload</p>
                 </li>

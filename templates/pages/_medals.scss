@@ -1,0 +1,130 @@
+.medals {
+    .medals-head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        h1 {
+            font-family: 'MarianneBold';
+            font-size: 54px;
+            background-size: 100%;
+            background-repeat: repeat;
+            color: transparent;
+            background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+            background-clip: text;
+            -webkit-background-clip: text;
+            padding: 5rem 0;
+
+            @include bkp(lg) {
+                text-align: center;
+            }
+        }
+    }
+
+    .medals-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+        width: 95vw;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+
+        .tfc-container {
+            width: 100%;
+            min-height: 0;
+
+            table {
+                width: 100%;
+            }
+        }
+
+        .medal-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            justify-content: center;
+
+            img {
+                height: 28px;
+                width: 28px;
+                object-fit: cover;
+                border-radius: 3px;
+            }
+        }
+    }
+}
+
+.medal-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+
+    .medal-modal-content {
+        background-color: #FFFFFF;
+        border-radius: 5px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+
+        h2 {
+            font-family: 'MarianneBold';
+            font-size: 24px;
+            padding-bottom: 1rem;
+        }
+
+        h3 {
+            font-family: 'MarianneBold';
+            font-size: 16px;
+            padding: 1rem 0 0.5rem;
+        }
+
+        .medal-filter {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .medal-options {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #d7d7d7;
+            border-radius: 5px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+
+            .medal-option {
+                padding: 0.35rem 0;
+                font-family: 'SpectralLight';
+                font-size: 14px;
+
+                label {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    cursor: pointer;
+                }
+            }
+
+            .medal-option-empty {
+                font-family: 'SpectralLight';
+                font-size: 14px;
+                color: #666666;
+            }
+        }
+
+        .medal-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding-top: 1.5rem;
+        }
+    }
+}
