@@ -12,6 +12,7 @@ class OperationModel extends Model
     {
         parent::__construct();
         $this->table = "-";
+        helper('date');
     }
 
     public function get_all_operations()
@@ -145,7 +146,7 @@ class OperationModel extends Model
             PointsCategoryModel::Operation->value,
             20,
             $reported_by,
-            'Présence à l\'opération ' . $operation["name"] . ' du ' . $operation["date"]
+            'Présence à l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
         ]);
     }
 
@@ -163,7 +164,7 @@ class OperationModel extends Model
             PointsCategoryModel::Operation->value,
             -5,
             $reported_by,
-            'Absence à l\'opération ' . $operation["name"] . ' du ' . $operation["date"]
+            'Absence à l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
         ]);
     }
 
@@ -185,7 +186,7 @@ class OperationModel extends Model
             PointsCategoryModel::Operation->value,
             25,
             $updated_by,
-            'Correction de présence (absent -> présent) pour l\'opération ' . $operation["name"] . ' du ' . $operation["date"]
+            'Correction de présence (absent -> présent) pour l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
         ]);
     }
 
@@ -207,7 +208,7 @@ class OperationModel extends Model
             PointsCategoryModel::Operation->value,
             -25,
             $updated_by,
-            'Correction de présence (présent -> absent) pour l\'opération ' . $operation["name"] . ' du ' . $operation["date"]
+            'Correction de présence (présent -> absent) pour l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
         ]);
     }
 }
