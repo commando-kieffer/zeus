@@ -2,8 +2,18 @@ select {
     border: none;
     border-bottom: 1px solid #000000;
     border-radius: 5px 5px 0 0;
-    padding: 0.5rem;
+    padding: 0.5rem 1.75rem 0.5rem 0.5rem;
     font-family: 'SpectralLight';
     font-size: 12px;
     min-width: 250px;
+    height: 2.25rem;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23000000' stroke-width='1.5'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 10px 6px;
 }

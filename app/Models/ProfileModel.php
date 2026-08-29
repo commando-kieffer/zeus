@@ -19,13 +19,13 @@ class ProfileModel extends Model
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://forum.commandokieffer.com/index.php/api/users/$user_id",
+            CURLOPT_URL => "http://forum.commandokieffer.ch/index.php/api/users/$user_id",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 0,
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
-                'XF-Api-User: 7', // Avec l'ID du commandant, pour avoir accès à des champs restreints (ex : groupes) aux utilisateurs non-admin
+                'XF-Api-User: 33', // Avec l'ID du commandant, pour avoir accès à des champs restreints (ex : groupes) aux utilisateurs non-admin
                 'XF-Api-Key: ' . env("XEN_API_KEY"),
             ),
         ));
@@ -42,7 +42,7 @@ class ProfileModel extends Model
         curl_close($curl);
         
         $data = json_decode($response, true);
-    
+
         if (empty($data["errors"]) && !empty($data["user"]))
             return $data["user"];
     

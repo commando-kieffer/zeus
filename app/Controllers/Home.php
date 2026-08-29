@@ -6,6 +6,7 @@ use CodeIgniter\HTTP\Exceptions\RedirectException;
 
 use \App\Models\ProfileModel;
 use \App\Models\PointsModel;
+use \App\Models\OperationModel;
 
 class Home extends BaseController
 {
@@ -22,12 +23,17 @@ class Home extends BaseController
     public function index(): string
     {
         $points_model = model(PointsModel::class);
+        $operation_model = model(OperationModel::class);
 
         $members = $points_model->get_active_members_by_troop($points_model->get_active_members_with_points());
 
         return view('generic/head')
             . view('generic/header')
-            . view('home',  ['members' => $members])
+            . view('home', [
+                'members' => $members,
+                'last_operation' => $operation_model->get_last_operation(),
+                'next_operation' => $operation_model->get_next_operation(),
+            ])
             . view('generic/footer')
             . view('generic/foot');
     }
@@ -85,19 +91,6 @@ class Home extends BaseController
                 'profil' => $profil,
                 'points_history' => $points_history
             ])
-            . view('generic/footer')
-            . view('generic/foot');
-    }
-
-    public function training()
-    {
-        $points_model = model(PointsModel::class);
-
-        $members = $points_model->get_active_members_by_troop($points_model->get_active_members());
-
-        return view('generic/head')
-            . view('generic/header')
-            . view('training', ['members' => $members])
             . view('generic/footer')
             . view('generic/foot');
     }

@@ -1,0 +1,138 @@
+// Carte opération, réutilisée par la liste des opérations et par l'accueil.
+.operation-card {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    max-width: 90vw;
+    border-radius: 5px;
+    padding: 1.5rem;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    color: inherit;
+
+    h2 {
+        font-family: 'MarianneBold';
+        font-size: 20px;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        font-family: 'MarianneThin';
+        font-size: 14px;
+    }
+
+    &:hover {
+        outline: solid 1px black;
+        transition: 0s;
+        cursor: pointer;
+    }
+}
+
+.operations {
+    .operations-head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        h1 {
+            font-family: 'MarianneBold';
+            font-size: 54px;
+            background-size: 100%;
+            background-repeat: repeat;
+            color: transparent;
+            background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+            background-clip: text;
+            -webkit-background-clip: text;
+            padding: 5rem 0;
+
+            @include bkp(lg) {
+                text-align: center;
+            }
+        }
+    }
+
+    .operations-list {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        gap: 2rem;
+        max-width: 95vw;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+
+        .empty-state {
+            font-family: 'MarianneThin';
+            font-size: 18px;
+        }
+    }
+
+    .operation-detail {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1rem;
+
+        h1 {
+            font-family: 'MarianneBold';
+            font-size: 54px;
+            background-size: 100%;
+            background-repeat: repeat;
+            color: transparent;
+            background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+            background-clip: text;
+            -webkit-background-clip: text;
+            padding: 3rem 0 1rem;
+            text-align: center;
+        }
+
+        .operation-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-family: 'SpectralBold';
+            font-size: 14px;
+            padding-bottom: 2rem;
+        }
+
+        .operation-description {
+            font-family: 'MarianneThin';
+            font-size: 16px;
+            text-align: justify;
+            padding-bottom: 2rem;
+        }
+
+        a.outline-btn-inverse {
+            display: inline-block;
+            margin-bottom: 3rem;
+        }
+    }
+
+    .operation-report {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 2rem;
+
+        h2 {
+            font-family: 'MarianneBold';
+            font-size: 28px;
+            padding-bottom: 2rem;
+            text-align: center;
+        }
+
+        .operation-report-grid {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 2rem;
+            max-width: 95vw;
+            margin: 0 auto;
+        }
+
+        .operation-report-actions {
+            padding: 2rem 0 3rem;
+        }
+    }
+}

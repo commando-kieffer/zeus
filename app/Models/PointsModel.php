@@ -161,19 +161,6 @@ class PointsModel extends Model
         return $hist;
     }
 
-    public function set_new_training($title, $date)
-    {
-        $query = "INSERT INTO panel_operation VALUES(NULL, ?, ?)";
-        $this->db->query($query, array($title, $date));
-    }
-
-    public function get_last_training()
-    {
-        $query = "SELECT id FROM panel_operation ORDER BY id DESC LIMIT 1";
-        $result = $this->db->query($query);
-        return $result->getResult()[0]->id;
-    }
-
     public function set_training_presence($member_id, $training)
     {
         $query = "INSERT INTO panel_historique VALUES(?, ?, ?)";

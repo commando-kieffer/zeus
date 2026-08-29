@@ -35,43 +35,32 @@
                     margin-bottom: 4rem;
                 }
             }
+            p.operation-meta {
+                font-family: 'SpectralLight';
+                font-size: 16px;
+                padding-bottom: 2rem;
+                text-align: center;
+            }
+            .form-errors {
+                color: #B00020;
+                font-family: 'SpectralLight';
+                font-size: 13px;
+                padding-bottom: 1rem;
+                li {
+                    margin-bottom: 0.25rem;
+                }
+            }
         }
         .tf-content {
             display: flex;
             flex-flow: row wrap;
             align-items: flex-start;
             gap: 2rem;
-            .tfc-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                min-height: 1012px;
-                border-radius: 5px;
-                padding: 1.5rem;
-                box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-                .badge {
-                    margin: 1rem;
-                }
-                table {
-                    tr {
-                        th {
-                            font-family: 'MarianneBold';
-                            font-size: 16px;
-                        }
-                        td {
-                            text-align: center;
-                            min-width: 100px;
-                            font-family: 'MarianneThin';
-                            font-size: 14px;
-                            img {
-                                height: 45px;
-                            }
-                            input {
-                                min-width: 0;
-                            }
-                        }
-                    }
-                }
+            textarea {
+                width: 100%;
+                max-width: 600px;
+                min-height: 160px;
+                margin: 0 auto;
             }
         }
         .tf-foot {

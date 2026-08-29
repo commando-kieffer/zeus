@@ -1,6 +1,23 @@
 <main class="home">
-    <section class="welcome">
-        <h1>Bienvenue sur Zeus</h1>
+    <section class="home-operations">
+        <?php if (empty($last_operation) && empty($next_operation)) { ?>
+        <p class="empty-state">Aucune opération pour le moment.</p>
+        <?php } else { ?>
+            <?php if (!empty($last_operation)) { ?>
+            <a class="operation-card" href="/operations/<?php echo $last_operation->id ?>">
+                <h2>Dernière opération : <?php echo esc($last_operation->name) ?></h2>
+                <p><?php echo (new DateTime($last_operation->date))->format('d/m/Y') ?></p>
+                <p><?php echo esc($last_operation->location) ?></p>
+            </a>
+            <?php } ?>
+            <?php if (!empty($next_operation)) { ?>
+            <a class="operation-card" href="/operations/<?php echo $next_operation->id ?>">
+                <h2>Prochaine opération : <?php echo esc($next_operation->name) ?></h2>
+                <p><?php echo (new DateTime($next_operation->date))->format('d/m/Y') ?></p>
+                <p><?php echo esc($next_operation->location) ?></p>
+            </a>
+            <?php } ?>
+        <?php } ?>
     </section>
 
     <section class="barracks-container">

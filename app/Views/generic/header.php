@@ -19,25 +19,42 @@
             </div>
         </div>
     </div>
+    <?php $current_user = session("user"); ?>
     <nav>
         <ul>
             <li><a href="/">Accueil</a></li>
             <li><a href="/profil">Mon profil</a></li>
             <li><a href="/">Salle des cartes</a></li>
+            <li>
+                <p id="operations-menu">Opérations</p>
+            </li>
             <?php if (session("user")['is_staff']) { ?>
                 <li>
                     <p id="points">Points</p>
                 </li>
                 <li><a href="#">Décorations</a></li>
-                <li><a href="#">Upload galerie</a></li>
-                <li><a href="#">Upload carte</a></li>
+            <?php } ?>
+            <?php if (is_team_leader($current_user)) { ?>
+                <li>
+                    <p id="upload-menu">Upload</p>
+                </li>
+            <?php } ?>
+        </ul>
+    </nav>
+    <nav class="sub sub-operations">
+        <ul>
+            <li><a href="/operations">Liste</a></li>
+            <?php if (can_create_operations($current_user)) { ?>
+                <li><a href="/operations/create">Créer une opération</a></li>
+            <?php } ?>
+            <?php if (is_squad_or_team_leader($current_user)) { ?>
+                <li><a href="/operations/report">Rapport de présence</a></li>
             <?php } ?>
         </ul>
     </nav>
     <?php if (session("user")['is_staff']) { ?>
-    <nav class="sub">
+    <nav class="sub sub-points">
         <ul>
-            <li><a href="/points/training">Training</a></li>
             <li><a href="/points/work">Points pour métier</a></li>
             <li><a href="/points/blame">Blâme</a></li>
             <li><a href="/points/warning">Avertissement</a></li>
@@ -45,16 +62,34 @@
         </ul>
     </nav>
     <?php } ?>
+    <?php if (is_team_leader($current_user)) { ?>
+    <nav class="sub sub-upload">
+        <ul>
+            <li><a href="/upload/galerie">Upload galerie</a></li>
+            <li><a href="#">Upload carte</a></li>
+        </ul>
+    </nav>
+    <?php } ?>
 </header>
 
 <script>
-    document.getElementById("points").addEventListener("click", function() {
-        const subMenu = document.querySelector(".sub");
+    function toggleSubMenu(triggerId, subMenuSelector) {
+        const trigger = document.getElementById(triggerId);
+        if (!trigger) return;
 
-        if (subMenu.style.display === "none" || subMenu.style.display === "") {
-            subMenu.style.display = "block";
-        } else {
-            subMenu.style.display = "none";
-        }
-    });
+        trigger.addEventListener("click", function() {
+            const subMenu = document.querySelector(subMenuSelector);
+            const wasOpen = subMenu.style.display === "block";
+
+            document.querySelectorAll(".sub").forEach(function(el) {
+                el.style.display = "none";
+            });
+
+            subMenu.style.display = wasOpen ? "none" : "block";
+        });
+    }
+
+    toggleSubMenu("operations-menu", ".sub-operations");
+    toggleSubMenu("points", ".sub-points");
+    toggleSubMenu("upload-menu", ".sub-upload");
 </script>

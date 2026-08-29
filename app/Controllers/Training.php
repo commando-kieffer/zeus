@@ -19,31 +19,6 @@ class Training extends BaseController
         }
     }
     
-    public function add_training()
-    {
-        $points_model = model(PointsModel::class);
-
-        $points_model->set_new_training($_POST['title'], $_POST['date']);
-        $active_members = $points_model->get_active_members();
-
-        $training = [
-            "id" => $points_model->get_last_training(),
-            "title" => $_POST['title'],
-            "date" => $_POST['date']
-        ];
-
-        foreach($active_members as $member) {
-            if (isset($_POST[$member->user_id])) {
-                $points_model->set_training_presence($member->user_id, $training);
-            }
-            else {
-                $points_model->set_training_absence($member->user_id, $training);
-            }
-        }
-
-        return redirect('operation_success');
-    }
-
     public function add_correct_point()
     {
         $points_model = model(PointsModel::class);

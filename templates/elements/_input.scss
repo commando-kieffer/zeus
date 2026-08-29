@@ -1,4 +1,4 @@
-input {
+input, textarea {
     border: none;
     border-bottom: 1px solid #000000;
     border-radius: 5px;
@@ -6,4 +6,8 @@ input {
     font-family: 'SpectralLight';
     font-size: 12px;
     min-width: 250px;
+}
+
+textarea {
+    resize: vertical;
 }
