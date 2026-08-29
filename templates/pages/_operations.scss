@@ -27,6 +27,67 @@
         transform: translateY(-3px);
         cursor: pointer;
     }
+
+    .card-ratings {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-top: 0.85rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid rgba(15, 14, 51, 0.1);
+    }
+
+    .card-rating-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'SpectralLight';
+        font-size: 12px;
+        color: rgba(15, 14, 51, 0.75);
+
+        .card-rating-value {
+            font-family: 'MarianneBold';
+            color: $ink;
+        }
+    }
+}
+
+// Widget de notation 5 étoiles (accessible, sans JS) : les inputs radio sont
+// masqués et les labels affichent l'étoile ; l'ordre DOM est inversé
+// (5 -> 1) pour que le sélecteur "~" illumine les bonnes étoiles au survol
+// et à la sélection, tout en gardant l'ordre visuel 1 -> 5 à l'écran.
+.star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 0.2rem;
+
+    input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        min-width: 0;
+        padding: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    label {
+        font-size: 30px;
+        line-height: 1;
+        color: rgba(15, 14, 51, 0.18);
+        cursor: pointer;
+        transition: color $transition-base, transform $transition-base;
+    }
+
+    label:hover,
+    label:hover ~ label,
+    input:checked ~ label {
+        color: $ink;
+    }
+
+    label:hover {
+        transform: scale(1.15);
+    }
 }
 
 .operations {
@@ -127,7 +188,91 @@
 
         .operation-back {
             align-self: flex-start;
+            margin: 1rem 0;
+        }
+
+        .operation-vote-card {
+            width: 100%;
+            max-width: 560px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: $radius-lg;
+            box-shadow: $shadow-card;
+            padding: 1.75rem 2rem;
             margin-bottom: 2rem;
+
+            h2 {
+                font-family: 'MarianneBold';
+                font-size: 20px;
+                text-align: center;
+                margin-bottom: 1.5rem;
+            }
+
+            form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
+            }
+
+            button[type="submit"] {
+                margin-top: 0.25rem;
+            }
+        }
+
+        .vote-criterion {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+
+            .vote-criterion-label {
+                font-family: 'SpectralLight';
+                font-size: 14px;
+                text-align: center;
+            }
+        }
+
+        .vote-results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+
+            li {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 1rem;
+                font-family: 'SpectralLight';
+                font-size: 15px;
+                padding-bottom: 0.6rem;
+                border-bottom: 1px solid rgba(15, 14, 51, 0.08);
+
+                &:last-child {
+                    border-bottom: none;
+                    padding-bottom: 0;
+                }
+            }
+
+            .vote-criterion-score {
+                font-family: 'MarianneBold';
+                font-size: 16px;
+                white-space: nowrap;
+            }
+        }
+
+        .vote-voter-count {
+            font-family: 'SpectralLight';
+            font-size: 13px;
+            color: rgba(15, 14, 51, 0.6);
+            text-align: center;
+        }
+
+        .vote-empty {
+            font-family: 'SpectralLight';
+            font-size: 14px;
+            color: rgba(15, 14, 51, 0.6);
+            text-align: center;
         }
     }
 

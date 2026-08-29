@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\Exceptions\RedirectException;
 use \App\Models\ProfileModel;
 use \App\Models\PointsModel;
 use \App\Models\OperationModel;
+use \App\Models\OperationVoteModel;
 
 class Home extends BaseController
 {
@@ -24,15 +25,23 @@ class Home extends BaseController
     {
         $points_model = model(PointsModel::class);
         $operation_model = model(OperationModel::class);
+        $vote_model = model(OperationVoteModel::class);
 
         $members = $points_model->get_active_members_by_troop($points_model->get_active_members_with_points());
+        $last_operation = $operation_model->get_last_operation();
+        $next_operation = $operation_model->get_next_operation();
+
+        $operation_ids = array_map(fn($op) => $op->id, array_filter([$last_operation, $next_operation]));
+        $visible_averages = $vote_model->get_visible_averages_for_member(session('user')['user_id'], $operation_ids);
 
         return view('generic/head')
             . view('generic/header')
             . view('home', [
                 'members' => $members,
-                'last_operation' => $operation_model->get_last_operation(),
-                'next_operation' => $operation_model->get_next_operation(),
+                'last_operation' => $last_operation,
+                'next_operation' => $next_operation,
+                'visible_averages' => $visible_averages,
+                'vote_criteria_short' => OperationVoteModel::CRITERIA_SHORT,
             ])
             . view('generic/footer')
             . view('generic/foot');

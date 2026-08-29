@@ -5,6 +5,7 @@ namespace App\Controllers;
 use CodeIgniter\HTTP\Exceptions\RedirectException;
 
 use App\Models\OperationModel;
+use App\Models\OperationVoteModel;
 use App\Models\PointsModel;
 
 class Operation extends BaseController
@@ -50,11 +51,19 @@ class Operation extends BaseController
     public function index()
     {
         $operation_model = model(OperationModel::class);
+        $vote_model = model(OperationVoteModel::class);
         $operations = $operation_model->get_all_operations();
+
+        $operation_ids = array_map(fn($op) => $op->id, $operations);
+        $visible_averages = $vote_model->get_visible_averages_for_member(session('user')['user_id'], $operation_ids);
 
         return view('generic/head')
             . view('generic/header')
-            . view('operations', ['operations' => $operations])
+            . view('operations', [
+                'operations' => $operations,
+                'visible_averages' => $visible_averages,
+                'vote_criteria_short' => OperationVoteModel::CRITERIA_SHORT,
+            ])
             . view('generic/footer')
             . view('generic/foot');
     }
@@ -79,6 +88,12 @@ class Operation extends BaseController
             $report_map = $operation_model->get_operation_report($operation_id);
         }
 
+        $vote_model = model(OperationVoteModel::class);
+        $presence = $operation_model->get_member_presence($operation_id, $user['user_id']);
+        $has_voted = $vote_model->has_voted($operation_id, $user['user_id']);
+        $can_vote = $presence === true && !$has_voted;
+        $can_view_averages = $presence !== true || $has_voted;
+
         return view('generic/head')
             . view('generic/header')
             . view('operation', [
@@ -87,6 +102,10 @@ class Operation extends BaseController
                 'is_officer' => is_officer($user),
                 'report_troops' => $report_troops,
                 'report_map' => $report_map,
+                'can_vote' => $can_vote,
+                'can_view_averages' => $can_view_averages,
+                'vote_criteria' => OperationVoteModel::CRITERIA,
+                'vote_averages' => $vote_model->get_averages($operation_id),
             ])
             . view('generic/footer')
             . view('generic/foot');
@@ -269,6 +288,54 @@ class Operation extends BaseController
                 $operation_model->correct_to_present($member->user_id, $operation_array, $user['user_id']);
             }
         }
+
+        return redirect()->to('/operations/' . $operation_id);
+    }
+
+    /**
+     * Vote d'un membre sur les 3 critères d'une opération. Réservé aux membres
+     * ayant été rapportés présents à cette opération, et une seule fois chacun.
+     */
+    public function submit_vote($operation_id)
+    {
+        $user = session('user');
+        $operation_model = model(OperationModel::class);
+        $operation = $operation_model->get_operation($operation_id);
+
+        if (empty($operation)) {
+            return $this->render_message("L'opération recherchée n'existe pas.");
+        }
+
+        $vote_model = model(OperationVoteModel::class);
+        $presence = $operation_model->get_member_presence($operation_id, $user['user_id']);
+
+        if ($presence !== true) {
+            return $this->render_message("Vous n'avez pas participé à cette opération, vous ne pouvez donc pas la noter.");
+        }
+
+        if ($vote_model->has_voted($operation_id, $user['user_id'])) {
+            return $this->render_message("Vous avez déjà noté cette opération.");
+        }
+
+        $rules = [
+            'map_rating' => 'required|in_list[1,2,3,4,5]',
+            'mapping_rating' => 'required|in_list[1,2,3,4,5]',
+            'defense_rating' => 'required|in_list[1,2,3,4,5]',
+            'attack_rating' => 'required|in_list[1,2,3,4,5]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return $this->render_message("Merci de donner une note (de 1 à 5) pour chaque critère.");
+        }
+
+        $vote_model->submit_vote(
+            $operation_id,
+            $user['user_id'],
+            (int) $_POST['map_rating'],
+            (int) $_POST['mapping_rating'],
+            (int) $_POST['defense_rating'],
+            (int) $_POST['attack_rating']
+        );
 
         return redirect()->to('/operations/' . $operation_id);
     }

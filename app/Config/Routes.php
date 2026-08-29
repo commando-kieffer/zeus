@@ -42,6 +42,7 @@ $routes->post('/points/modify_training_presence', 'Training::modify_training_pre
 $routes->post('/operations/create', 'Operation::store');
 $routes->post('/operations/report/(:num)', 'Operation::submit_report/$1');
 $routes->post('/operations/(:num)/update_report', 'Operation::update_report/$1');
+$routes->post('/operations/(:num)/vote', 'Operation::submit_vote/$1');
 $routes->post('/upload/galerie', 'Upload::store_gallery');
 $routes->post('/medals/toggle', 'Medal::toggle');
 

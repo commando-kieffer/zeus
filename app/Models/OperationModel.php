@@ -118,6 +118,19 @@ class OperationModel extends Model
         return $report;
     }
 
+    /**
+     * Statut de présence d'un membre pour une opération donnée :
+     * true (présent), false (marqué absent), ou null (aucun rapport pour ce membre).
+     */
+    public function get_member_presence($operation_id, $member_id)
+    {
+        $query = "SELECT present FROM operation_report WHERE operation_id = ? AND member_id = ?";
+        $result = $this->db->query($query, array($operation_id, $member_id));
+        $row = $result->getResult()[0] ?? null;
+
+        return $row === null ? null : (bool) $row->present;
+    }
+
     public function set_operation_presence($member_id, $operation, $reported_by)
     {
         $query = "INSERT INTO operation_report (operation_id, member_id, present, reported_by, reported_at) VALUES (?, ?, 1, ?, NOW())";
