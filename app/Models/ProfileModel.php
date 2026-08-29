@@ -25,7 +25,7 @@ class ProfileModel extends Model
             CURLOPT_TIMEOUT => 0,
             CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
-                'XF-Api-User: 33', // Avec l'ID du commandant, pour avoir accès à des champs restreints (ex : groupes) aux utilisateurs non-admin
+                'XF-Api-User: 8', // Avec l'ID du compte Commando Kieffer, pour avoir accès à des champs restreints (ex : groupes) aux utilisateurs non-admin
                 'XF-Api-Key: ' . env("XEN_API_KEY"),
             ),
         ));
