@@ -19,7 +19,7 @@ class ProfileModel extends Model
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "http://forum.commandokieffer.ch/index.php/api/users/$user_id",
+            CURLOPT_URL => env("FORUM_BASE_URI") . "/index.php/api/users/$user_id",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 0,

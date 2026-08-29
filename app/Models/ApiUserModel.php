@@ -22,7 +22,7 @@ class ApiUserModel extends Model {
         $url_pw = rawurlencode($password);
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "http://forum.commandokieffer.ch/index.php/api/auth/?login=" . $url_name . "&password=" . $url_pw,
+            CURLOPT_URL => env("FORUM_BASE_URI") . "/index.php/api/auth/?login=" . $url_name . "&password=" . $url_pw,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_TIMEOUT => 0,
