@@ -1,5 +1,9 @@
 header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
     background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 8px 20px -8px;
     .header-top {
         display: flex;
         flex-flow: row nowrap;
@@ -36,7 +40,7 @@ header {
                 align-items: center;
                 padding: 0.5rem 1.75rem;
                 background-image: radial-gradient( circle 993px at 0.5% 50.5%,  rgba(137,171,245,0.37) 0%, rgba(245,247,252,1) 100.2% );
-                border-radius: 7px;
+                border-radius: $radius-md;
                 @include bkp(lg) {
                     background-image: none;
                 }
@@ -80,44 +84,50 @@ header {
             }
         }
     }
-    nav {
-        border-top: 1px solid #FFFFFF;
+    nav:not(.sub) {
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
         @include bkp(lg) {
-            overflow-x: scroll;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
         }
-        ul {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            gap: 1.5rem;
-            padding: 1rem;
-            @include bkp(lg) {
-                justify-content: flex-start;
+    }
+    nav ul {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1rem;
+        @include bkp(lg) {
+            justify-content: flex-start;
+        }
+        li {
+            p {
+                font-family: 'MarianneThin';
+                font-size: 14px;
+                color: gainsboro;
+                transition: color $transition-base;
+                &:hover {
+                    color: #FFFFFF;
+                    cursor: pointer;
+                }
             }
-            li {
-                p {
-                    font-family: 'MarianneThin';
-                    font-size: 14px;
-                    color: gainsboro;
-                    &:hover {
-                        color: #FFFFFF;
-                        cursor: pointer;
-                    }
+            a {
+                font-family: 'MarianneThin';
+                font-size: 14px;
+                color: gainsboro;
+                padding-bottom: 2px;
+                border-bottom: 1px solid transparent;
+                transition: color $transition-base, border-color $transition-base;
+                &:hover {
+                    color: #FFFFFF;
+                    border-bottom-color: #FFFFFF;
                 }
-                a {
-                    font-family: 'MarianneThin';
-                    font-size: 14px;
-                    color: gainsboro;
-                    &:hover {
-                        color: #FFFFFF;
-                        border-bottom: 1px solid #FFFFFF;
-                    }
-                }
-                @include bkp(lg) {
-                    white-space: nowrap;
-                    padding-right: 1rem;                
-                }
+            }
+            @include bkp(lg) {
+                white-space: nowrap;
+                padding-right: 1rem;
             }
         }
     }
@@ -125,5 +135,15 @@ header {
         display: none;
         border-top: 1px solid rgba(133, 133, 133, 0.493);
         background-image: linear-gradient( 111.4deg,  rgb(39, 39, 41) 6.5%, rgb(13, 11, 51) 93.2% );
+
+        ul {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            flex-wrap: nowrap;
+        }
+
+        &.open {
+            display: block;
+        }
     }
 }

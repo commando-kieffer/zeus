@@ -1,5 +1,6 @@
 <main class="operations">
     <section class="operation-detail">
+        <a href="/operations" class="outline-btn-inverse operation-back">&larr; Retour à la liste</a>
         <h1><?php echo esc($operation->name) ?></h1>
         <div class="operation-meta">
             <span><?php echo (new DateTime($operation->date))->format('d/m/Y') ?></span>
@@ -12,7 +13,6 @@
                 <p>Aucune description fournie.</p>
             <?php } ?>
         </div>
-        <a href="/operations" class="outline-btn-inverse">Retour à la liste</a>
     </section>
 
     <?php if ($can_view_report) { ?>

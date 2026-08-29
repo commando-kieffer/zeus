@@ -20,19 +20,21 @@
                 @include bkp(lg) {
                     text-align: center;
                 }
+                @include bkp(sm) {
+                    font-size: 38px;
+                    padding: 3rem 0;
+                }
             }
             .tf-sub {
                 display: flex;
-                flex-direction: row;
-                gap: 2rem;
+                flex-flow: row wrap;
+                justify-content: center;
+                gap: 1.25rem;
+                margin-bottom: 2.5rem;
                 @include bkp(sm) {
                     flex-direction: column;
-                    gap: 0;
-                }
-                input {
-                    border-radius: 5px 5px 0 0;
-                    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-                    margin-bottom: 4rem;
+                    align-items: center;
+                    gap: 0.75rem;
                 }
             }
             p.operation-meta {
@@ -45,17 +47,26 @@
                 color: #B00020;
                 font-family: 'SpectralLight';
                 font-size: 13px;
-                padding-bottom: 1rem;
+                background-color: rgba(176, 0, 32, 0.08);
+                border: 1px solid rgba(176, 0, 32, 0.25);
+                border-radius: $radius-sm;
+                padding: 1rem 1.25rem;
+                margin-bottom: 1.5rem;
                 li {
                     margin-bottom: 0.25rem;
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
                 }
             }
         }
         .tf-content {
             display: flex;
             flex-flow: row wrap;
+            justify-content: center;
             align-items: flex-start;
             gap: 2rem;
+            padding: 0 1rem;
             textarea {
                 width: 100%;
                 max-width: 600px;

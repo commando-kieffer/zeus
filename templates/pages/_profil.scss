@@ -14,6 +14,8 @@
 		}
 		img {
 			border-radius: 50%;
+			max-width: 100%;
+			height: auto;
 		}
 		.profil-info {
 			display: flex;
@@ -37,6 +39,9 @@
 				);
 				background-clip: text;
 				-webkit-background-clip: text;
+				@include bkp(sm) {
+					font-size: 36px;
+				}
 			}
 			h2 {
 				font-family: 'MarianneRegular';
@@ -76,10 +81,25 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			font-family: 'MarianneThin';
-			font-size: 16px;
+			min-width: 140px;
+			background-color: rgba(255, 255, 255, 0.6);
+			border-radius: $radius-lg;
+			box-shadow: $shadow-card;
+			padding: 1.5rem 2rem;
+			transition: $transition-base;
+			&:hover {
+				box-shadow: $shadow-card-hover;
+				transform: translateY(-2px);
+			}
+			h3 {
+				font-family: 'MarianneRegular';
+				font-size: 0.9rem;
+				opacity: 0.65;
+			}
 			p {
-				padding: 0.5rem;
+				font-family: 'MarianneBold';
+				font-size: 1.8rem;
+				padding-top: 0.35rem;
 			}
 		}
 	}
@@ -133,8 +153,9 @@
 				max-width: 90vw;
 				display: grid;
 				grid-template-columns: repeat(4, auto);
-				background-color: rgba(33, 33, 33, 0.02);
-				border-radius: 5px;
+				background-color: rgba(255, 255, 255, 0.6);
+				border-radius: $radius-lg;
+				box-shadow: $shadow-card;
                 overflow-x: auto;
 
 				.trow {
@@ -146,14 +167,24 @@
 					font-size: 1.2rem;
 					display: inline-block;
                     min-width: max-content;
+					transition: background-color 0.15s ease;
 				}
 
 				.thead.trow .tdata {
-					border-bottom: 1px solid #33333380;
+					font-family: 'MarianneBold';
+					border-bottom: 1px solid rgba(15, 14, 51, 0.2);
 				}
 
 				.tbody.trow .tdata {
 					border-bottom: 1px solid rgba(133, 133, 133, 0.2);
+				}
+
+				.tbody.trow:nth-child(even) .tdata {
+					background-color: rgba(15, 14, 51, 0.03);
+				}
+
+				.tbody.trow:hover .tdata {
+					background-color: rgba(15, 14, 51, 0.07);
 				}
 			}
 		}
@@ -185,27 +216,34 @@
 			flex-wrap: wrap;
 			gap: 4rem;
 			.pm-sub {
-        text-align: center;
+				text-align: center;
 				display: flex;
 				flex-direction: column;
-				// max-width: 5rem;
-        width: 250px;
-				gap: 1rem;
+				width: 250px;
+				gap: 0.5rem;
+				background-color: rgba(255, 255, 255, 0.6);
+				border-radius: $radius-lg;
+				box-shadow: $shadow-card;
+				padding: 1.5rem 1rem;
+				transition: $transition-base;
+				&:hover {
+					box-shadow: $shadow-card-hover;
+					transform: translateY(-2px);
+				}
 				h4 {
 					font-family: 'MarianneThin';
 					font-size: 1rem;
 					min-height: 3rem;
-					padding-top: 1rem;
 				}
 				img {
-					// width: 50px;
-          height: 100px;
-          margin: 0 auto;
+					height: 100px;
+					margin: 0 auto;
+					border-radius: $radius-sm;
 				}
 				p {
 					font-family: 'MarianneThin';
 					font-size: 0.8rem;
-          display: hidden;
+					display: hidden;
 				}
 			}
 		}

@@ -18,6 +18,11 @@
             @include bkp(lg) {
                 text-align: center;
             }
+
+            @include bkp(sm) {
+                font-size: 38px;
+                padding: 3rem 0;
+            }
         }
     }
 
@@ -37,6 +42,15 @@
 
             table {
                 width: 100%;
+                display: table;
+                table-layout: fixed;
+
+                th, td {
+                    &:nth-child(1) { width: 20%; overflow-wrap: anywhere; }
+                    &:nth-child(2) { width: 10%; }
+                    &:nth-child(3) { width: 55%; }
+                    &:nth-child(4) { width: 15%; }
+                }
             }
         }
 
@@ -44,13 +58,20 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.35rem;
-            justify-content: center;
+            justify-content: flex-start;
+            align-content: center;
 
             img {
                 height: 28px;
                 width: 28px;
                 object-fit: cover;
-                border-radius: 3px;
+                border-radius: $radius-sm;
+                box-shadow: rgba(15, 14, 51, 0.15) 0px 2px 6px;
+                transition: $transition-base;
+
+                &:hover {
+                    transform: scale(1.15);
+                }
             }
         }
     }
@@ -60,7 +81,9 @@
     display: none;
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(9, 8, 31, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     z-index: 1000;
     align-items: center;
     justify-content: center;
@@ -68,12 +91,13 @@
 
     .medal-modal-content {
         background-color: #FFFFFF;
-        border-radius: 5px;
+        border-radius: $radius-lg;
         padding: 2rem;
         max-width: 500px;
         width: 100%;
         max-height: 85vh;
         overflow-y: auto;
+        box-shadow: $shadow-float;
 
         h2 {
             font-family: 'MarianneBold';
@@ -95,15 +119,21 @@
         .medal-options {
             max-height: 200px;
             overflow-y: auto;
-            border: 1px solid #d7d7d7;
-            border-radius: 5px;
+            border: 1px solid rgba(15, 14, 51, 0.15);
+            border-radius: $radius-md;
             padding: 0.5rem;
             margin-top: 0.5rem;
 
             .medal-option {
-                padding: 0.35rem 0;
+                padding: 0.5rem 0.6rem;
+                border-radius: $radius-sm;
                 font-family: 'SpectralLight';
                 font-size: 14px;
+                transition: background-color $transition-base;
+
+                &:hover {
+                    background-color: rgba(15, 14, 51, 0.05);
+                }
 
                 label {
                     display: flex;

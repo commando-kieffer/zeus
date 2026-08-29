@@ -6,3 +6,17 @@ $breakpoints: (
   lg: 992px,
   xl: 1200px
 );
+
+// Design tokens (rayons, ombres, transitions). Palette et polices d'origine conservées.
+$ink: #0F0E33;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 18px;
+$radius-pill: 999px;
+
+$shadow-card: rgba(15, 14, 51, 0.16) 0px 20px 40px -14px, rgba(15, 14, 51, 0.12) 0px 6px 16px -6px;
+$shadow-card-hover: rgba(15, 14, 51, 0.26) 0px 24px 44px -14px, rgba(15, 14, 51, 0.16) 0px 10px 20px -8px;
+$shadow-float: rgba(15, 14, 51, 0.35) 0px 14px 28px -10px;
+
+$transition-base: 0.2s ease;

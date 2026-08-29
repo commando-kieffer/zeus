@@ -19,10 +19,12 @@
                 <tr>
                     <td><?php echo $member->username ?></td>
                     <td><img src="/pictures/jackets/<?php echo $member->user_group_id ?>.png" alt=""></td>
-                    <td class="medal-icons">
-                        <?php foreach ($all_medals as $medal) { if (in_array($medal->id, $owned_ids)) { ?>
-                        <img src="/pictures/medailles/<?php echo esc($medal->name) ?>.jpg" title="<?php echo esc($medal->title) ?>" alt="<?php echo esc($medal->title) ?>">
-                        <?php }} ?>
+                    <td>
+                        <div class="medal-icons">
+                            <?php foreach ($all_medals as $medal) { if (in_array($medal->id, $owned_ids)) { ?>
+                            <img src="/pictures/medailles/<?php echo esc($medal->name) ?>.jpg" title="<?php echo esc($medal->title) ?>" alt="<?php echo esc($medal->title) ?>">
+                            <?php }} ?>
+                        </div>
                     </td>
                     <td>
                         <button type="button" class="outline-btn-inverse medal-modal-trigger" data-target="medal-modal-<?php echo $member->user_id ?>">Gérer</button>

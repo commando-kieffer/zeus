@@ -5,29 +5,56 @@
     flex-direction: column;
     align-items: center;
     min-height: 1012px;
-    border-radius: 5px;
-    padding: 1.5rem;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    border-radius: $radius-lg;
+    padding: 1.75rem;
+    background-color: rgba(255, 255, 255, 0.6);
+    box-shadow: $shadow-card;
+    transition: box-shadow $transition-base;
+
+    @include bkp(md) {
+        min-height: 0;
+    }
+
+    &:hover {
+        box-shadow: $shadow-card-hover;
+    }
+
     .badge {
         margin: 1rem;
     }
+
     table {
+        width: 100%;
+        max-width: 100%;
+        display: block;
+        overflow-x: auto;
+        border-collapse: collapse;
+        -webkit-overflow-scrolling: touch;
+
         tr {
             th {
                 font-family: 'MarianneBold';
                 font-size: 16px;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid rgba(15, 14, 51, 0.12);
             }
             td {
                 text-align: center;
                 min-width: 100px;
                 font-family: 'MarianneThin';
                 font-size: 14px;
+                padding: 0.6rem 0;
+                border-bottom: 1px solid rgba(15, 14, 51, 0.06);
                 img {
                     height: 45px;
+                    border-radius: $radius-sm;
                 }
                 input {
                     min-width: 0;
                 }
+            }
+            &:last-child td {
+                border-bottom: none;
             }
         }
     }

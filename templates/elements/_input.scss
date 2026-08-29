@@ -1,13 +1,46 @@
 input, textarea {
-    border: none;
-    border-bottom: 1px solid #000000;
-    border-radius: 5px;
-    padding: 0.5rem;
+    border: 1px solid rgba(15, 14, 51, 0.15);
+    border-radius: $radius-sm;
+    padding: 0.65rem 0.9rem;
     font-family: 'SpectralLight';
     font-size: 12px;
     min-width: 250px;
+    background-color: #FFFFFF;
+    transition: $transition-base;
+
+    &:hover {
+        border-color: rgba(15, 14, 51, 0.35);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: $ink;
+        box-shadow: 0 0 0 3px rgba(15, 14, 51, 0.12);
+    }
+
+    &::placeholder {
+        color: rgba(15, 14, 51, 0.45);
+    }
+
+    &:read-only {
+        background-color: rgba(15, 14, 51, 0.04);
+        cursor: default;
+    }
 }
 
 textarea {
     resize: vertical;
+}
+
+input[type="checkbox"], input[type="radio"] {
+    min-width: 0;
+    width: 1.05rem;
+    height: 1.05rem;
+    padding: 0;
+    accent-color: $ink;
+    cursor: pointer;
+
+    &:focus {
+        box-shadow: none;
+    }
 }

@@ -24,7 +24,6 @@
         <ul>
             <li><a href="/">Accueil</a></li>
             <li><a href="/profil">Mon profil</a></li>
-            <li><a href="/">Salle des cartes</a></li>
             <li>
                 <p id="operations-menu">Opérations</p>
             </li>
@@ -79,13 +78,13 @@
 
         trigger.addEventListener("click", function() {
             const subMenu = document.querySelector(subMenuSelector);
-            const wasOpen = subMenu.style.display === "block";
+            const wasOpen = subMenu.classList.contains("open");
 
             document.querySelectorAll(".sub").forEach(function(el) {
-                el.style.display = "none";
+                el.classList.remove("open");
             });
 
-            subMenu.style.display = wasOpen ? "none" : "block";
+            if (!wasOpen) subMenu.classList.add("open");
         });
     }
 

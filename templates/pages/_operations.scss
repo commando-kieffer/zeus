@@ -4,9 +4,11 @@
     flex-direction: column;
     width: 320px;
     max-width: 90vw;
-    border-radius: 5px;
-    padding: 1.5rem;
-    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    border-radius: $radius-lg;
+    padding: 1.75rem;
+    background-color: rgba(255, 255, 255, 0.6);
+    box-shadow: $shadow-card;
+    transition: $transition-base;
     color: inherit;
 
     h2 {
@@ -21,8 +23,8 @@
     }
 
     &:hover {
-        outline: solid 1px black;
-        transition: 0s;
+        box-shadow: $shadow-card-hover;
+        transform: translateY(-3px);
         cursor: pointer;
     }
 }
@@ -46,6 +48,11 @@
 
             @include bkp(lg) {
                 text-align: center;
+            }
+
+            @include bkp(sm) {
+                font-size: 38px;
+                padding: 3rem 0;
             }
         }
     }
@@ -84,26 +91,43 @@
             -webkit-background-clip: text;
             padding: 3rem 0 1rem;
             text-align: center;
+
+            @include bkp(sm) {
+                font-size: 32px;
+            }
         }
 
         .operation-meta {
             display: flex;
-            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
             font-family: 'SpectralBold';
-            font-size: 14px;
+            font-size: 13px;
             padding-bottom: 2rem;
+
+            span {
+                background-color: rgba(15, 14, 51, 0.06);
+                border-radius: $radius-pill;
+                padding: 0.4rem 1rem;
+            }
         }
 
         .operation-description {
             font-family: 'MarianneThin';
             font-size: 16px;
+            line-height: 1.7;
             text-align: justify;
-            padding-bottom: 2rem;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: $radius-lg;
+            box-shadow: $shadow-card;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
         }
 
-        a.outline-btn-inverse {
-            display: inline-block;
-            margin-bottom: 3rem;
+        .operation-back {
+            align-self: flex-start;
+            margin-bottom: 2rem;
         }
     }
 

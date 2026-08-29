@@ -1,19 +1,30 @@
 select {
-    border: none;
-    border-bottom: 1px solid #000000;
-    border-radius: 5px 5px 0 0;
-    padding: 0.5rem 1.75rem 0.5rem 0.5rem;
+    border: 1px solid rgba(15, 14, 51, 0.15);
+    border-radius: $radius-sm;
+    padding: 0.6rem 2rem 0.6rem 0.9rem;
     font-family: 'SpectralLight';
     font-size: 12px;
     min-width: 250px;
-    height: 2.25rem;
+    height: 2.5rem;
     line-height: 1;
     cursor: pointer;
+    background-color: #FFFFFF;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23000000' stroke-width='1.5'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%230F0E33' stroke-width='1.5'/></svg>");
     background-repeat: no-repeat;
-    background-position: right 0.6rem center;
+    background-position: right 0.85rem center;
     background-size: 10px 6px;
+    transition: $transition-base;
+
+    &:hover {
+        border-color: rgba(15, 14, 51, 0.35);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: $ink;
+        box-shadow: 0 0 0 3px rgba(15, 14, 51, 0.12);
+    }
 }

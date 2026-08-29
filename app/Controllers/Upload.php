@@ -59,7 +59,7 @@ class Upload extends BaseController
 
         $rules = [
             'picture' => 'uploaded[picture]|is_image[picture]|mime_in[picture,image/png,image/jpeg]|max_size[picture,20480]',
-            'description' => 'required|max_length[5000]',
+            'description' => 'required|max_length[128]',
             'category' => 'required|in_list[' . implode(',', $valid_slugs) . ']',
         ];
 

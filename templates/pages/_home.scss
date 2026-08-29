@@ -37,6 +37,11 @@
         @include bkp(lg) {
           text-align: center;
         }
+
+        @include bkp(sm) {
+          font-size: 38px;
+          padding: 3rem 0;
+        }
       }
 
       .sub {
@@ -77,10 +82,16 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        border-radius: 5px;
-        padding: 1.5rem;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+        border-radius: $radius-lg;
+        padding: 1.75rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        box-shadow: $shadow-card;
+        transition: box-shadow $transition-base;
         max-width: 90vw;
+
+        &:hover {
+          box-shadow: $shadow-card-hover;
+        }
 
         .badge {
           margin: 1.5rem;
@@ -88,13 +99,12 @@
         }
 
         .member {
-          box-sizing: border-box;
           padding: 0.5rem 0;
+          transition: background-color 0.15s ease;
         }
 
         .member:hover {
-          outline: solid 1px black;
-          transition: 0s;
+          background-color: rgba(15, 14, 51, 0.05);
           cursor: pointer;
         }
 
@@ -112,6 +122,8 @@
             th {
               font-family: 'MarianneBold';
               font-size: 16px;
+              padding-bottom: 0.5rem;
+              border-bottom: 1px solid rgba(15, 14, 51, 0.12);
             }
 
             td {
@@ -123,6 +135,7 @@
 
               img {
                 height: 45px;
+                border-radius: $radius-sm;
               }
 
               input {
