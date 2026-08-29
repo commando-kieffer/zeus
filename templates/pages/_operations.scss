@@ -22,6 +22,10 @@
         font-size: 14px;
     }
 
+    .operation-scenarist {
+        margin-top: 0.4rem;
+    }
+
     &:hover {
         box-shadow: $shadow-card-hover;
         transform: translateY(-3px);
@@ -158,20 +162,36 @@
             }
         }
 
+        .operation-header-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            padding-bottom: 2rem;
+        }
+
         .operation-meta {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: center;
             gap: 0.75rem;
             font-family: 'SpectralBold';
             font-size: 13px;
-            padding-bottom: 2rem;
 
             span {
                 background-color: rgba(15, 14, 51, 0.06);
                 border-radius: $radius-pill;
                 padding: 0.4rem 1rem;
             }
+        }
+
+        .operation-scenarist {
+            background-color: rgba(15, 14, 51, 0.06);
+            border-radius: $radius-pill;
+            padding: 0.4rem 1rem;
+            font-family: 'SpectralBold';
+            font-size: 13px;
         }
 
         .operation-description {

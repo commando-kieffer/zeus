@@ -2,9 +2,14 @@
     <section class="operation-detail">
         <a href="/operations" class="outline-btn-inverse operation-back">&larr; Retour à la liste</a>
         <h1><?php echo esc($operation->name) ?></h1>
-        <div class="operation-meta">
-            <span><?php echo (new DateTime($operation->date))->format('d/m/Y') ?></span>
-            <span><?php echo esc($operation->location) ?></span>
+        <div class="operation-header-meta">
+            <div class="operation-meta">
+                <span><?php echo (new DateTime($operation->date))->format('d/m/Y') ?></span>
+                <span><?php echo esc($operation->location) ?></span>
+            </div>
+            <?php if (!empty($operation->scenarist_name)) { ?>
+            <span class="operation-scenarist">Par <?php echo esc($operation->scenarist_name) ?></span>
+            <?php } ?>
         </div>
 
         <?php if ($can_vote) { ?>

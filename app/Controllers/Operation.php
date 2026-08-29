@@ -117,9 +117,11 @@ class Operation extends BaseController
             return $this->render_message("Vous n'avez pas la permission d'accéder à cette page.");
         }
 
+        $points_model = model(PointsModel::class);
+
         return view('generic/head')
             . view('generic/header')
-            . view('create_operation')
+            . view('create_operation', ['members' => $points_model->get_active_members()])
             . view('generic/footer')
             . view('generic/foot');
     }
@@ -135,6 +137,7 @@ class Operation extends BaseController
             'date' => 'required|valid_date[Y-m-d]',
             'location' => 'required|max_length[255]',
             'description' => 'permit_empty|max_length[5000]',
+            'scenarist_id' => 'required|is_natural_no_zero',
         ];
 
         if (!$this->validate($rules)) {
@@ -149,7 +152,8 @@ class Operation extends BaseController
             $_POST['date'],
             $_POST['location'],
             $_POST['description'] ?? '',
-            session('user')['user_id']
+            session('user')['user_id'],
+            (int) $_POST['scenarist_id']
         );
 
         return redirect()->to('/operations/' . $operation_id);

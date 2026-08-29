@@ -10,6 +10,9 @@
             <h2><?php echo esc($op->name) ?></h2>
             <p class="operation-date"><?php echo (new DateTime($op->date))->format('d/m/Y') ?></p>
             <p class="operation-location"><?php echo esc($op->location) ?></p>
+            <?php if (!empty($op->scenarist_name)) { ?>
+            <p class="operation-scenarist">Par <?php echo esc($op->scenarist_name) ?></p>
+            <?php } ?>
             <?php if (isset($visible_averages[$op->id])) { $avg = $visible_averages[$op->id]; ?>
             <div class="card-ratings">
                 <?php foreach ($vote_criteria_short as $key => $label) { $avg_field = $key . '_avg'; ?>

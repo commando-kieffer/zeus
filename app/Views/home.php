@@ -8,6 +8,9 @@
                 <h2>Dernière opération : <?php echo esc($last_operation->name) ?></h2>
                 <p><?php echo (new DateTime($last_operation->date))->format('d/m/Y') ?></p>
                 <p><?php echo esc($last_operation->location) ?></p>
+                <?php if (!empty($last_operation->scenarist_name)) { ?>
+                <p class="operation-scenarist">Par <?php echo esc($last_operation->scenarist_name) ?></p>
+                <?php } ?>
                 <?php if (isset($visible_averages[$last_operation->id])) { $avg = $visible_averages[$last_operation->id]; ?>
                 <div class="card-ratings">
                     <?php foreach ($vote_criteria_short as $key => $label) { $avg_field = $key . '_avg'; ?>
@@ -25,6 +28,9 @@
                 <h2>Prochaine opération : <?php echo esc($next_operation->name) ?></h2>
                 <p><?php echo (new DateTime($next_operation->date))->format('d/m/Y') ?></p>
                 <p><?php echo esc($next_operation->location) ?></p>
+                <?php if (!empty($next_operation->scenarist_name)) { ?>
+                <p class="operation-scenarist">Par <?php echo esc($next_operation->scenarist_name) ?></p>
+                <?php } ?>
                 <?php if (isset($visible_averages[$next_operation->id])) { $avg = $visible_averages[$next_operation->id]; ?>
                 <div class="card-ratings">
                     <?php foreach ($vote_criteria_short as $key => $label) { $avg_field = $key . '_avg'; ?>

@@ -15,25 +15,27 @@ class OperationModel extends Model
         helper('date');
     }
 
+    private const OPERATION_SELECT = "SELECT o.*, su.username AS scenarist_name FROM operation o LEFT JOIN xf_user su ON su.user_id = o.scenarist_id";
+
     public function get_all_operations()
     {
-        $query = "SELECT * FROM operation ORDER BY date DESC";
+        $query = self::OPERATION_SELECT . " ORDER BY o.date DESC";
         $result = $this->db->query($query);
         return $result->getResult();
     }
 
     public function get_operation($operation_id)
     {
-        $query = "SELECT * FROM operation WHERE id = ?";
+        $query = self::OPERATION_SELECT . " WHERE o.id = ?";
         $result = $this->db->query($query, array($operation_id));
         $rows = $result->getResult();
         return $rows[0] ?? null;
     }
 
-    public function create_operation($name, $date, $location, $description, $created_by)
+    public function create_operation($name, $date, $location, $description, $created_by, $scenarist_id)
     {
-        $query = "INSERT INTO operation (name, date, location, description, created_by, created_at) VALUES (?, ?, ?, ?, ?, NOW())";
-        $this->db->query($query, array($name, $date, $location, $description, $created_by));
+        $query = "INSERT INTO operation (name, date, location, description, created_by, scenarist_id, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        $this->db->query($query, array($name, $date, $location, $description, $created_by, $scenarist_id));
         return $this->db->insertID();
     }
 
@@ -42,7 +44,7 @@ class OperationModel extends Model
      */
     public function get_last_operation()
     {
-        $query = "SELECT * FROM operation WHERE date < CURDATE() ORDER BY date DESC LIMIT 1";
+        $query = self::OPERATION_SELECT . " WHERE o.date < CURDATE() ORDER BY o.date DESC LIMIT 1";
         $result = $this->db->query($query);
         $rows = $result->getResult();
         return $rows[0] ?? null;
@@ -53,7 +55,7 @@ class OperationModel extends Model
      */
     public function get_next_operation()
     {
-        $query = "SELECT * FROM operation WHERE date > CURDATE() ORDER BY date ASC LIMIT 1";
+        $query = self::OPERATION_SELECT . " WHERE o.date > CURDATE() ORDER BY o.date ASC LIMIT 1";
         $result = $this->db->query($query);
         $rows = $result->getResult();
         return $rows[0] ?? null;
