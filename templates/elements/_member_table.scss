@@ -1,0 +1,34 @@
+// Carte "troupe" réutilisée par les formulaires de rapport (training, opérations)
+// et par la consultation du rapport d'une opération.
+.tfc-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 1012px;
+    border-radius: 5px;
+    padding: 1.5rem;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    .badge {
+        margin: 1rem;
+    }
+    table {
+        tr {
+            th {
+                font-family: 'MarianneBold';
+                font-size: 16px;
+            }
+            td {
+                text-align: center;
+                min-width: 100px;
+                font-family: 'MarianneThin';
+                font-size: 14px;
+                img {
+                    height: 45px;
+                }
+                input {
+                    min-width: 0;
+                }
+            }
+        }
+    }
+}
