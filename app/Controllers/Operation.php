@@ -18,6 +18,8 @@ class Operation extends BaseController
             throw new RedirectException('login');
             exit;
         }
+
+        helper('date');
     }
 
     private function render_message(string $message): string
@@ -99,6 +101,7 @@ class Operation extends BaseController
             . view('operation', [
                 'operation' => $operation,
                 'can_view_report' => $can_view_report,
+                'operation_done' => is_operation_done($operation->date),
                 'is_officer' => is_officer($user),
                 'report_troops' => $report_troops,
                 'report_map' => $report_map,
@@ -174,6 +177,7 @@ class Operation extends BaseController
         $operation_model = model(OperationModel::class);
         $member_ids = array_map(fn($member) => $member->user_id, $troop['members']);
         $operations = $operation_model->get_pending_operations_for_troop($member_ids);
+        $operations = array_values(array_filter($operations, fn($op) => is_operation_done($op->date)));
 
         return view('generic/head')
             . view('generic/header')
@@ -193,6 +197,10 @@ class Operation extends BaseController
         $operation = $operation_model->get_operation($operation_id);
         if (empty($operation)) {
             return $this->render_message("L'opération recherchée n'existe pas.");
+        }
+
+        if (!is_operation_done($operation->date)) {
+            return $this->render_message("Le rapport de cette opération ne peut être rédigé qu'à partir de 21h le jour de l'opération.");
         }
 
         $troop = $this->get_own_troop($user);
@@ -223,6 +231,10 @@ class Operation extends BaseController
         $operation = $operation_model->get_operation($operation_id);
         if (empty($operation)) {
             return $this->render_message("L'opération recherchée n'existe pas.");
+        }
+
+        if (!is_operation_done($operation->date)) {
+            return $this->render_message("Le rapport de cette opération ne peut être rédigé qu'à partir de 21h le jour de l'opération.");
         }
 
         $troop = $this->get_own_troop($user);
@@ -264,6 +276,10 @@ class Operation extends BaseController
         $operation = $operation_model->get_operation($operation_id);
         if (empty($operation)) {
             return $this->render_message("L'opération recherchée n'existe pas.");
+        }
+
+        if (!is_operation_done($operation->date)) {
+            return $this->render_message("Le rapport de cette opération ne peut être rédigé qu'à partir de 21h le jour de l'opération.");
         }
 
         $operation_array = (array) $operation;

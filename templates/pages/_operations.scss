@@ -310,6 +310,14 @@
             text-align: center;
         }
 
+        .operation-report-pending {
+            font-family: 'SpectralLight';
+            font-size: 14px;
+            color: rgba(15, 14, 51, 0.6);
+            text-align: center;
+            padding-bottom: 2rem;
+        }
+
         .operation-report-grid {
             display: flex;
             flex-flow: row wrap;

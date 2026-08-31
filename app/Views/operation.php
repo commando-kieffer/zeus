@@ -61,6 +61,9 @@
     <?php if ($can_view_report) { ?>
     <section class="operation-report">
         <h2>Rapport de présence</h2>
+        <?php if (!$operation_done) { ?>
+        <p class="operation-report-pending">Le rapport de présence sera disponible à partir de 21h le jour de l'opération.</p>
+        <?php } else { ?>
         <?php if ($is_officer) { ?>
         <form action="/operations/<?php echo $operation->id ?>/update_report" method="post">
         <?php } ?>
@@ -98,6 +101,7 @@
                 <button type="submit" class="outline-btn-inverse">METTRE À JOUR</button>
             </div>
         </form>
+        <?php } ?>
         <?php } ?>
     </section>
     <?php } ?>
