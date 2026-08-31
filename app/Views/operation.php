@@ -58,7 +58,6 @@
         </div>
     </section>
 
-    <?php if ($can_view_report) { ?>
     <section class="operation-report">
         <h2>Rapport de présence</h2>
         <?php if (!$operation_done) { ?>
@@ -104,5 +103,4 @@
         <?php } ?>
         <?php } ?>
     </section>
-    <?php } ?>
 </main>

@@ -80,14 +80,30 @@ class Operation extends BaseController
         }
 
         $user = session('user');
-        $can_view_report = is_squad_or_team_leader($user);
-        $report_troops = [];
-        $report_map = [];
 
-        if ($can_view_report) {
-            $points_model = model(PointsModel::class);
-            $report_troops = $points_model->get_active_members_by_troop($points_model->get_active_members());
-            $report_map = $operation_model->get_operation_report($operation_id);
+        $points_model = model(PointsModel::class);
+        $report_troops = $points_model->get_active_members_by_troop($points_model->get_active_members());
+        $report_map = $operation_model->get_operation_report($operation_id);
+
+        // Un membre rapporté (présent ou absent) doit rester visible même s'il
+        // n'appartient plus aux membres actifs (parti du commando, changé de
+        // troop...) : on complète les troops avec les membres manquants.
+        $known_ids = [];
+        foreach ($report_troops as $troop) {
+            foreach ($troop['members'] as $member) {
+                $known_ids[] = (int) $member->user_id;
+            }
+        }
+        $missing_ids = array_diff(array_map('intval', array_keys($report_map)), $known_ids);
+        if (!empty($missing_ids)) {
+            $former_members = $operation_model->get_members_by_ids(array_values($missing_ids));
+            if (!empty($former_members)) {
+                $report_troops['former'] = [
+                    'title' => 'ANCIENS MEMBRES',
+                    'id' => 'former',
+                    'members' => $former_members,
+                ];
+            }
         }
 
         $vote_model = model(OperationVoteModel::class);
@@ -100,7 +116,6 @@ class Operation extends BaseController
             . view('generic/header')
             . view('operation', [
                 'operation' => $operation,
-                'can_view_report' => $can_view_report,
                 'operation_done' => is_operation_done($operation->date),
                 'is_officer' => is_officer($user),
                 'report_troops' => $report_troops,

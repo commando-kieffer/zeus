@@ -106,6 +106,25 @@ class OperationModel extends Model
     }
 
     /**
+     * Récupère les membres correspondant aux IDs donnés tels qu'enregistrés
+     * dans xf_user, sans filtrer sur l'appartenance active (contrairement à
+     * PointsModel::get_active_members()). Utile pour retrouver, dans un
+     * rapport de présence passé, les membres qui ont depuis quitté le
+     * commando ou changé de troop : leur nom doit rester visible même s'ils
+     * ne correspondent plus aux critères de membre actif.
+     */
+    public function get_members_by_ids(array $member_ids)
+    {
+        if (empty($member_ids)) return [];
+
+        $placeholders = implode(',', array_fill(0, count($member_ids), '?'));
+        $query = "SELECT username, user_group_id, secondary_group_ids, user_id FROM xf_user WHERE user_id IN ($placeholders)";
+        $result = $this->db->query($query, $member_ids);
+
+        return $result->getResult();
+    }
+
+    /**
      * Rapport complet d'une opération : member_id => présent (bool).
      */
     public function get_operation_report($operation_id)
