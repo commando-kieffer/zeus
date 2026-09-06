@@ -1,4 +1,4 @@
-<main class="training">
+<main class="training operation-report-form">
     <form action="/operations/report/<?php echo $operation->id ?>" method="post" class="training-form">
         <div class="tf-head">
             <h1>Rapport de présence</h1>
@@ -7,6 +7,7 @@
         <div class="tf-content">
             <div class="tfc-container">
                 <div class="badge badge<?php echo $troop['id'] ?>"><?php echo $troop['title']; ?></div>
+                <textarea name="note" placeholder="Compte-rendu de la troop pour cette opération..." rows="8"></textarea>
                 <table>
                     <tr>
                         <th>Nom</th>
@@ -17,7 +18,13 @@
                     <tr class="tfcc-member">
                         <td><?php echo $member->username ?></td>
                         <td><img src="/pictures/jackets/<?php echo $member->user_group_id ?>.png" alt=""></td>
-                        <td><input name="<?php echo $member->user_id ?>" type="checkbox"></td>
+                        <td>
+                            <select name="<?php echo $member->user_id ?>">
+                                <option value="present">Présent</option>
+                                <option value="absent" selected>Absent</option>
+                                <option value="unjustified">Absence injustifiée</option>
+                            </select>
+                        </td>
                     </tr>
                     <?php } ?>
                 </table>

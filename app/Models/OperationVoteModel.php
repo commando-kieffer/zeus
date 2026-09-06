@@ -116,12 +116,12 @@ class OperationVoteModel extends Model
         $averages = $this->get_averages_for_operations($operation_ids);
 
         $placeholders = implode(',', array_fill(0, count($operation_ids), '?'));
-        $presence_query = "SELECT operation_id, present FROM operation_report WHERE member_id = ? AND operation_id IN ($placeholders)";
+        $presence_query = "SELECT operation_id, status FROM operation_report WHERE member_id = ? AND operation_id IN ($placeholders)";
         $presence_result = $this->db->query($presence_query, array_merge([$member_id], $operation_ids));
 
         $presence = [];
         foreach ($presence_result->getResult() as $row) {
-            $presence[$row->operation_id] = (bool) $row->present;
+            $presence[$row->operation_id] = $row->status === 'present';
         }
 
         $voted_ids = $this->get_voted_operation_ids($member_id, $operation_ids);

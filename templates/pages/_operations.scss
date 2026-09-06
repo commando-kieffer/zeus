@@ -331,5 +331,59 @@
         .operation-report-actions {
             padding: 2rem 0 3rem;
         }
+
+        .troop-report-note {
+            width: 100%;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid rgba(15, 14, 51, 0.1);
+            text-align: left;
+
+            h3 {
+                font-family: 'MarianneBold';
+                font-size: 14px;
+                margin-bottom: 0.6rem;
+            }
+
+            p {
+                font-family: 'MarianneThin';
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            textarea {
+                width: 100%;
+                min-height: 100px;
+            }
+        }
+
+        .troop-report-note-empty {
+            color: rgba(15, 14, 51, 0.5);
+            font-style: italic;
+        }
+    }
+}
+
+// Page de rédaction du rapport : une seule troop affichée (contrairement à
+// la grille multi-troops de correct_point/blame/warning/work, qui a besoin
+// du min-height uniforme de .tfc-container pour aligner ses cartes), donc le
+// min-height fixe n'a pas lieu d'être : il ne fait que créer un grand vide.
+// La carte accueille aussi le compte-rendu (badge, puis compte-rendu, puis
+// tableau, dans cet ordre), donc élargie pour bien recevoir le textarea.
+.operation-report-form .tfc-container {
+    min-height: 0;
+    width: 100%;
+    max-width: 700px;
+
+    // La table de base est en display:block (pour le défilement horizontal
+    // sur mobile), ce qui l'empêche de se centrer via margin:auto. On repasse
+    // ici en display:table (comme pour .medals-list) pour qu'elle reprenne sa
+    // largeur naturelle et se centre, avec un espace net au-dessus (vs le
+    // compte-rendu) plutôt que d'être collée dessous.
+    table {
+        display: table;
+        width: auto;
+        max-width: 100%;
+        margin: 2rem auto 0;
     }
 }

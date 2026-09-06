@@ -125,111 +125,118 @@ class OperationModel extends Model
     }
 
     /**
-     * Rapport complet d'une opération : member_id => présent (bool).
+     * Les 3 statuts de présence possibles pour un membre sur une opération.
+     */
+    public const STATUSES = ['present', 'absent', 'unjustified'];
+
+    /**
+     * Effet de chaque statut sur les compteurs du membre, relatif à l'absence
+     * de tout rapport (0 partout) : points, présences (panel_prs), absences
+     * (panel_abs). "unjustified" retire les mêmes points qu'un "absent"
+     * classique, seul le libellé/l'historique diffère.
+     */
+    private const STATUS_EFFECT = [
+        'present' => ['points' => 20, 'prs' => 1, 'abs' => 0],
+        'absent' => ['points' => -5, 'prs' => 0, 'abs' => 1],
+        'unjustified' => ['points' => -5, 'prs' => 0, 'abs' => 1],
+    ];
+
+    private const STATUS_LABEL = [
+        'present' => 'présent',
+        'absent' => 'absent',
+        'unjustified' => 'absence injustifiée',
+    ];
+
+    private const STATUS_INITIAL_MESSAGE = [
+        'present' => 'Présence',
+        'absent' => 'Absence',
+        'unjustified' => 'Absence injustifiée',
+    ];
+
+    /**
+     * Rapport complet d'une opération : member_id => statut ('present',
+     * 'absent' ou 'unjustified').
      */
     public function get_operation_report($operation_id)
     {
-        $query = "SELECT member_id, present FROM operation_report WHERE operation_id = ?";
+        $query = "SELECT member_id, status FROM operation_report WHERE operation_id = ?";
         $result = $this->db->query($query, array($operation_id));
 
         $report = [];
         foreach ($result->getResult() as $row) {
-            $report[$row->member_id] = (bool) $row->present;
+            $report[$row->member_id] = $row->status;
         }
 
         return $report;
     }
 
     /**
-     * Statut de présence d'un membre pour une opération donnée :
-     * true (présent), false (marqué absent), ou null (aucun rapport pour ce membre).
+     * Statut de présence d'un membre pour une opération donnée : 'present',
+     * 'absent', 'unjustified', ou null (aucun rapport pour ce membre).
      */
     public function get_member_presence($operation_id, $member_id)
     {
-        $query = "SELECT present FROM operation_report WHERE operation_id = ? AND member_id = ?";
+        $query = "SELECT status FROM operation_report WHERE operation_id = ? AND member_id = ?";
         $result = $this->db->query($query, array($operation_id, $member_id));
         $row = $result->getResult()[0] ?? null;
 
-        return $row === null ? null : (bool) $row->present;
+        return $row === null ? null : $row->status;
     }
 
-    public function set_operation_presence($member_id, $operation, $reported_by)
+    /**
+     * Premier rapport d'un membre pour une opération (aucune ligne
+     * operation_report préexistante). $status doit être une valeur de
+     * self::STATUSES.
+     */
+    public function record_operation_status($member_id, $operation, $reported_by, string $status)
     {
-        $query = "INSERT INTO operation_report (operation_id, member_id, present, reported_by, reported_at) VALUES (?, ?, 1, ?, NOW())";
-        $this->db->query($query, array($operation["id"], $member_id, $reported_by));
+        $query = "INSERT INTO operation_report (operation_id, member_id, status, reported_by, reported_at) VALUES (?, ?, ?, ?, NOW())";
+        $this->db->query($query, array($operation["id"], $member_id, $status, $reported_by));
 
-        $query = "UPDATE xf_user SET panel_pts = panel_pts + 20, panel_prs = panel_prs + 1 WHERE user_id = ?";
-        $this->db->query($query, array($member_id));
+        $effect = self::STATUS_EFFECT[$status];
+
+        $query = "UPDATE xf_user SET panel_pts = panel_pts + ?, panel_prs = panel_prs + ?, panel_abs = panel_abs + ? WHERE user_id = ?";
+        $this->db->query($query, array($effect['points'], $effect['prs'], $effect['abs'], $member_id));
 
         $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Operation->value,
-            20,
+            $effect['points'],
             $reported_by,
-            'Présence à l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
-        ]);
-    }
-
-    public function set_operation_absence($member_id, $operation, $reported_by)
-    {
-        $query = "INSERT INTO operation_report (operation_id, member_id, present, reported_by, reported_at) VALUES (?, ?, 0, ?, NOW())";
-        $this->db->query($query, array($operation["id"], $member_id, $reported_by));
-
-        $query = "UPDATE xf_user SET panel_pts = panel_pts - 5, panel_abs = panel_abs + 1 WHERE user_id = ?";
-        $this->db->query($query, array($member_id));
-
-        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
-        $this->db->query($query, [
-            $member_id,
-            PointsCategoryModel::Operation->value,
-            -5,
-            $reported_by,
-            'Absence à l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
+            self::STATUS_INITIAL_MESSAGE[$status] . ' à l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
         ]);
     }
 
     /**
-     * Correction : un membre déjà marqué absent pour cette opération passe présent.
-     * Annule le malus d'absence et applique le bonus de présence en une seule écriture nette.
+     * Correction du statut d'un membre déjà rapporté pour cette opération.
+     * Applique uniquement la différence de points/compteurs entre l'ancien
+     * et le nouveau statut (par exemple absent <-> absence injustifiée n'a
+     * aucun effet sur les points, seul l'historique en garde la trace).
      */
-    public function correct_to_present($member_id, $operation, $updated_by)
+    public function correct_operation_status($member_id, $operation, $updated_by, string $old_status, string $new_status)
     {
-        $query = "UPDATE operation_report SET present = 1, updated_by = ?, updated_at = NOW() WHERE operation_id = ? AND member_id = ?";
-        $this->db->query($query, array($updated_by, $operation["id"], $member_id));
+        if ($old_status === $new_status) return;
 
-        $query = "UPDATE xf_user SET panel_pts = panel_pts + 25, panel_prs = panel_prs + 1, panel_abs = panel_abs - 1 WHERE user_id = ?";
-        $this->db->query($query, array($member_id));
+        $query = "UPDATE operation_report SET status = ?, updated_by = ?, updated_at = NOW() WHERE operation_id = ? AND member_id = ?";
+        $this->db->query($query, array($new_status, $updated_by, $operation["id"], $member_id));
+
+        $old_effect = self::STATUS_EFFECT[$old_status];
+        $new_effect = self::STATUS_EFFECT[$new_status];
+        $points_diff = $new_effect['points'] - $old_effect['points'];
+        $prs_diff = $new_effect['prs'] - $old_effect['prs'];
+        $abs_diff = $new_effect['abs'] - $old_effect['abs'];
+
+        $query = "UPDATE xf_user SET panel_pts = panel_pts + ?, panel_prs = panel_prs + ?, panel_abs = panel_abs + ? WHERE user_id = ?";
+        $this->db->query($query, array($points_diff, $prs_diff, $abs_diff, $member_id));
 
         $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Operation->value,
-            25,
+            $points_diff,
             $updated_by,
-            'Correction de présence (absent -> présent) pour l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
-        ]);
-    }
-
-    /**
-     * Correction : un membre déjà marqué présent pour cette opération passe absent.
-     * Annule le bonus de présence et applique le malus d'absence en une seule écriture nette.
-     */
-    public function correct_to_absent($member_id, $operation, $updated_by)
-    {
-        $query = "UPDATE operation_report SET present = 0, updated_by = ?, updated_at = NOW() WHERE operation_id = ? AND member_id = ?";
-        $this->db->query($query, array($updated_by, $operation["id"], $member_id));
-
-        $query = "UPDATE xf_user SET panel_pts = panel_pts - 25, panel_prs = panel_prs - 1, panel_abs = panel_abs + 1 WHERE user_id = ?";
-        $this->db->query($query, array($member_id));
-
-        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
-        $this->db->query($query, [
-            $member_id,
-            PointsCategoryModel::Operation->value,
-            -25,
-            $updated_by,
-            'Correction de présence (présent -> absent) pour l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
+            'Correction de présence (' . self::STATUS_LABEL[$old_status] . ' -> ' . self::STATUS_LABEL[$new_status] . ') pour l\'opération "' . $operation["name"] . '" du ' . format_date_fr($operation["date"])
         ]);
     }
 }

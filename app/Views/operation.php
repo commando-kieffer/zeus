@@ -67,9 +67,27 @@
         <form action="/operations/<?php echo $operation->id ?>/update_report" method="post">
         <?php } ?>
             <div class="operation-report-grid">
-                <?php foreach ($report_troops as $troop) { if (!empty($troop['members'])) { ?>
+                <?php foreach ($report_troops as $troop) { if (!empty($troop['members'])) {
+                    $is_real_troop = $troop['id'] !== 'former';
+                    $can_view_note = $is_real_troop && ($is_team_leader || ($is_squad_leader && $own_troop_id !== null && (int) $own_troop_id === (int) $troop['id']));
+                    $note = $report_notes[(int) $troop['id']] ?? null;
+                ?>
                 <div class="tfc-container">
                     <div class="badge badge<?php echo $troop['id'] ?>"><?php echo $troop['title']; ?></div>
+
+                    <?php if ($can_view_note) { ?>
+                    <div class="troop-report-note">
+                        <h3>Compte-rendu</h3>
+                        <?php if ($is_officer) { ?>
+                        <textarea name="note_<?php echo $troop['id'] ?>" rows="4" placeholder="Compte-rendu de la troop..."><?php echo esc($note->content ?? '') ?></textarea>
+                        <?php } elseif (!empty($note->content)) { ?>
+                        <p><?php echo nl2br(esc($note->content)) ?></p>
+                        <?php } else { ?>
+                        <p class="troop-report-note-empty">Aucun compte-rendu pour le moment.</p>
+                        <?php } ?>
+                    </div>
+                    <?php } ?>
+
                     <table>
                         <tr>
                             <th>Nom</th>
@@ -77,17 +95,17 @@
                             <th>Présence</th>
                         </tr>
                         <?php foreach ($troop['members'] as $member) {
-                            $present = !empty($report_map[$member->user_id]);
+                            $status = $report_map[$member->user_id] ?? 'absent';
                         ?>
                         <tr class="tfcc-member">
-                            <td><?php echo $member->username ?></td>
+                            <td class="<?php echo $status !== 'present' ? 'member-name-' . $status : '' ?>"><?php echo $member->username ?></td>
                             <td><img src="/pictures/jackets/<?php echo $member->user_group_id ?>.png" alt=""></td>
                             <td>
-                                <?php if ($is_officer) { ?>
-                                <input type="checkbox" name="<?php echo $member->user_id ?>" <?php echo $present ? 'checked' : '' ?>>
-                                <?php } else { ?>
-                                <input type="checkbox" disabled <?php echo $present ? 'checked' : '' ?>>
-                                <?php } ?>
+                                <select name="<?php echo $member->user_id ?>" <?php echo $is_officer ? '' : 'disabled' ?>>
+                                    <?php foreach (['present' => 'Présent', 'absent' => 'Absent', 'unjustified' => 'Absence injustifiée'] as $value => $label) { ?>
+                                    <option value="<?php echo $value ?>" <?php echo $status === $value ? 'selected' : '' ?>><?php echo $label ?></option>
+                                    <?php } ?>
+                                </select>
                             </td>
                         </tr>
                         <?php } ?>

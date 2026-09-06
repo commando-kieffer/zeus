@@ -5,6 +5,7 @@ namespace App\Controllers;
 use CodeIgniter\HTTP\Exceptions\RedirectException;
 
 use App\Models\OperationModel;
+use App\Models\OperationReportNoteModel;
 use App\Models\OperationVoteModel;
 use App\Models\PointsModel;
 
@@ -109,8 +110,10 @@ class Operation extends BaseController
         $vote_model = model(OperationVoteModel::class);
         $presence = $operation_model->get_member_presence($operation_id, $user['user_id']);
         $has_voted = $vote_model->has_voted($operation_id, $user['user_id']);
-        $can_vote = $presence === true && !$has_voted;
-        $can_view_averages = $presence !== true || $has_voted;
+        $can_vote = $presence === 'present' && !$has_voted;
+        $can_view_averages = $presence !== 'present' || $has_voted;
+
+        $note_model = model(OperationReportNoteModel::class);
 
         return view('generic/head')
             . view('generic/header')
@@ -118,8 +121,12 @@ class Operation extends BaseController
                 'operation' => $operation,
                 'operation_done' => is_operation_done($operation->date),
                 'is_officer' => is_officer($user),
+                'is_team_leader' => is_team_leader($user),
+                'is_squad_leader' => is_squad_leader($user),
+                'own_troop_id' => $operation_model->get_member_troop_id($user['secondary_group_ids']),
                 'report_troops' => $report_troops,
                 'report_map' => $report_map,
+                'report_notes' => $note_model->get_notes_for_operation($operation_id),
                 'can_vote' => $can_vote,
                 'can_view_averages' => $can_view_averages,
                 'vote_criteria' => OperationVoteModel::CRITERIA,
@@ -265,11 +272,18 @@ class Operation extends BaseController
         $operation_array = (array) $operation;
 
         foreach ($troop['members'] as $member) {
-            if (isset($_POST[$member->user_id])) {
-                $operation_model->set_operation_presence($member->user_id, $operation_array, $user['user_id']);
-            } else {
-                $operation_model->set_operation_absence($member->user_id, $operation_array, $user['user_id']);
+            $status = $_POST[$member->user_id] ?? 'absent';
+            if (!in_array($status, OperationModel::STATUSES, true)) {
+                $status = 'absent';
             }
+
+            $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $status);
+        }
+
+        $note_content = trim($_POST['note'] ?? '');
+        if ($note_content !== '') {
+            $note_model = model(OperationReportNoteModel::class);
+            $note_model->set_note($operation_id, (int) $troop['id'], $note_content, $user['user_id']);
         }
 
         return redirect('operation_success');
@@ -304,23 +318,47 @@ class Operation extends BaseController
         $members = $points_model->get_active_members();
 
         foreach ($members as $member) {
-            $new_present = isset($_POST[$member->user_id]);
+            $new_status = $_POST[$member->user_id] ?? 'absent';
+            if (!in_array($new_status, OperationModel::STATUSES, true)) {
+                $new_status = 'absent';
+            }
+
             $had_report = array_key_exists($member->user_id, $current_report);
-            $was_present = $current_report[$member->user_id] ?? false;
+            $old_status = $current_report[$member->user_id] ?? 'absent';
 
             if (!$had_report) {
-                // Une case laissée décochée pour un membre jamais rapporté n'est
-                // pas une modification : on ne crée un rapport que s'il est coché.
-                if ($new_present) {
-                    $operation_model->set_operation_presence($member->user_id, $operation_array, $user['user_id']);
+                // Un statut laissé sur "absent" (valeur par défaut) pour un membre
+                // jamais rapporté n'est pas une modification : on ne crée un
+                // rapport que si un autre statut a été choisi.
+                if ($new_status !== 'absent') {
+                    $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $new_status);
                 }
                 continue;
             }
 
-            if ($was_present && !$new_present) {
-                $operation_model->correct_to_absent($member->user_id, $operation_array, $user['user_id']);
-            } elseif (!$was_present && $new_present) {
-                $operation_model->correct_to_present($member->user_id, $operation_array, $user['user_id']);
+            if ($new_status !== $old_status) {
+                $operation_model->correct_operation_status($member->user_id, $operation_array, $user['user_id'], $old_status, $new_status);
+            }
+        }
+
+        $note_model = model(OperationReportNoteModel::class);
+        $troops = $points_model->get_active_members_by_troop($members);
+
+        foreach (array_keys($troops) as $troop_id) {
+            $field = 'note_' . $troop_id;
+            if (!array_key_exists($field, $_POST)) {
+                continue;
+            }
+
+            $content = trim($_POST[$field]);
+            $existing_note = $note_model->get_note($operation_id, (int) $troop_id);
+
+            if ($existing_note === null) {
+                if ($content !== '') {
+                    $note_model->set_note($operation_id, (int) $troop_id, $content, $user['user_id']);
+                }
+            } elseif ($content !== $existing_note->content) {
+                $note_model->update_note($operation_id, (int) $troop_id, $content, $user['user_id']);
             }
         }
 
@@ -344,7 +382,7 @@ class Operation extends BaseController
         $vote_model = model(OperationVoteModel::class);
         $presence = $operation_model->get_member_presence($operation_id, $user['user_id']);
 
-        if ($presence !== true) {
+        if ($presence !== 'present') {
             return $this->render_message("Vous n'avez pas participé à cette opération, vous ne pouvez donc pas la noter.");
         }
 
