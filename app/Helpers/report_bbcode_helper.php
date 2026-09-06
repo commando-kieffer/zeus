@@ -51,7 +51,7 @@ if (!function_exists('format_operation_report_bbcode')) {
         $bbcode = "[SIZE=6][B][U]Informations générales[/U][/B][/SIZE]\n\n";
         $bbcode .= "[B][U]Opération :[/U][/B] {$operation->name}\n";
         $bbcode .= "[B][U]Carte :[/U][/B] {$operation->location}\n";
-        $bbcode .= "[B][U]Date:[/U][/B] " . format_date_fr($operation->date) . "\n\n";
+        $bbcode .= "[B][U]Date :[/U][/B] " . format_date_fr($operation->date) . "\n\n";
 
         $bbcode .= "[SIZE=6][B][U]Compte-rendu[/U][/B][/SIZE]\n\n";
         $bbcode .= $note_content . "\n\n";
@@ -90,27 +90,28 @@ if (!function_exists('report_bbcode_counts')) {
 
 if (!function_exists('report_bbcode_count_line')) {
     /**
-     * Ligne de décompte "x/y présents / x abs Justifiée, x abs Injustifiée",
-     * telle qu'utilisée pour chaque bordée et pour le total.
+     * Ligne de décompte telle qu'utilisée pour chaque bordée et pour le total.
      */
     function report_bbcode_count_line(array $counts): string
     {
-        return "{$counts['present']}/{$counts['total']} [COLOR=rgb(97, 189, 109)]présents[/COLOR] / "
-            . "{$counts['absent']} [COLOR=rgb(250, 197, 28)]abs Justifiée[/COLOR], "
-            . "{$counts['unjustified']} [COLOR=rgb(209, 72, 65)]abs Injustifiée[/COLOR]";
+        return "{$counts['present']}/{$counts['total']} [COLOR=rgb(97, 189, 109)]présents[/COLOR] "
+            . "([COLOR=rgb(250, 197, 28)]absences justifiées[/COLOR] : {$counts['absent']}, "
+            . "[COLOR=rgb(209, 72, 65)]absences injustifiées[/COLOR] : {$counts['unjustified']})";
     }
 }
 
 if (!function_exists('report_bbcode_member_list')) {
     /**
      * Liste nominative (une ligne par membre) d'une bordée, déjà triée.
+     * Chaque membre est précédé de l'abréviation de son grade (ex.
+     * "Qm2.Danson"), voir report_bbcode_rank_shorthand().
      */
     function report_bbcode_member_list(array $members): string
     {
         $labels = [
             'present' => 'Présent',
-            'absent' => 'Abs Justifiée',
-            'unjustified' => 'Abs Injustifiée',
+            'absent' => 'Absent',
+            'unjustified' => 'Absence injustifiée',
         ];
         $colors = [
             'present' => 'rgb(97, 189, 109)',
@@ -118,11 +119,48 @@ if (!function_exists('report_bbcode_member_list')) {
             'unjustified' => 'rgb(209, 72, 65)',
         ];
 
-        $lines = array_map(
-            fn($member) => "[B]{$member->username}[/B] ([COLOR={$colors[$member->status]}]{$labels[$member->status]}[/COLOR])",
-            $members
-        );
+        $lines = array_map(function ($member) use ($labels, $colors) {
+            $rank = report_bbcode_rank_shorthand((int) $member->user_group_id);
+            $name = $rank !== '' ? "$rank.{$member->username}" : $member->username;
+
+            return "[B]{$name}[/B] ([COLOR={$colors[$member->status]}]{$labels[$member->status]}[/COLOR])";
+        }, $members);
 
         return implode("\n", $lines);
+    }
+}
+
+if (!function_exists('report_bbcode_rank_shorthand')) {
+    /**
+     * Abréviation de grade (convention Marine nationale) affichée devant le
+     * pseudo dans la liste nominative, ex. "Qm2" pour "Quartier-maître de
+     * seconde classe". xf_user_group ne stocke que le titre complet, d'où
+     * cette table de correspondance dédiée - à ajuster si un grade a une
+     * abréviation "maison" différente de la convention standard.
+     */
+    function report_bbcode_rank_shorthand(int $user_group_id): string
+    {
+        $shorthands = [
+            5 => 'Cadet',
+            6 => 'Mtl',
+            7 => 'Mtb',
+            8 => 'Qm2',
+            9 => 'Qm1',
+            10 => 'Smm',
+            11 => 'Sm2',
+            12 => 'Sm1',
+            13 => 'M',
+            14 => 'Pm',
+            15 => 'Mp',
+            16 => 'Maj',
+            17 => 'Ev2',
+            18 => 'Ev1',
+            19 => 'Lv',
+            20 => 'CptC',
+            50 => 'Asp',
+            54 => 'Rsv',
+        ];
+
+        return $shorthands[$user_group_id] ?? '';
     }
 }
