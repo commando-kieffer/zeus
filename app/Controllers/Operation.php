@@ -4,8 +4,10 @@ namespace App\Controllers;
 
 use CodeIgniter\HTTP\Exceptions\RedirectException;
 
+use App\Models\ForumModel;
 use App\Models\OperationModel;
 use App\Models\OperationReportNoteModel;
+use App\Models\OperationReportPostModel;
 use App\Models\OperationVoteModel;
 use App\Models\PointsModel;
 
@@ -21,6 +23,7 @@ class Operation extends BaseController
         }
 
         helper('date');
+        helper('report_bbcode');
     }
 
     private function render_message(string $message): string
@@ -49,6 +52,63 @@ class Operation extends BaseController
         $troops = $points_model->get_active_members_by_troop($points_model->get_active_members());
 
         return $troops[$troop_id] ?? null;
+    }
+
+    /**
+     * Publie le message du rapport de présence d'une troop sur le forum, à
+     * la soumission initiale du rapport : crée toujours un nouveau message
+     * (voir update_operation_report_post() pour la correction d'un rapport
+     * déjà publié). Best-effort : un échec (forum indisponible, troop sans
+     * sujet dédié...) est journalisé mais ne doit jamais faire échouer
+     * l'action en cours, le rapport étant de toute façon déjà enregistré
+     * localement.
+     */
+    private function publish_operation_report($operation, int $troop_id, array $members_with_status, string $note_content, int $current_user_id): void
+    {
+        try {
+            $thread_id = OperationModel::TROOP_THREAD_ID[$troop_id] ?? null;
+            if ($thread_id === null) {
+                return;
+            }
+
+            $message = format_operation_report_bbcode($operation, $note_content, $members_with_status);
+            $forum_model = model(ForumModel::class);
+
+            $post_id = $forum_model->create_post($thread_id, $message, $current_user_id);
+            if ($post_id !== null) {
+                model(OperationReportPostModel::class)->set_post_id($operation->id, $troop_id, $post_id);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Échec de la publication du rapport sur le forum (opération ' . $operation->id . ', troop ' . $troop_id . ') : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Met à jour le message du rapport de présence d'une troop sur le forum,
+     * lors de la correction d'un rapport déjà soumis. Uniquement si un
+     * post_id est déjà connu : un rapport antérieur à cette fonctionnalité
+     * n'en a pas, et une correction ne va pas lui en créer un pour autant,
+     * elle est donc ignorée côté forum. Best-effort, comme
+     * publish_operation_report().
+     */
+    private function update_operation_report_post($operation, int $troop_id, array $members_with_status, string $note_content, int $current_user_id): void
+    {
+        try {
+            $post_model = model(OperationReportPostModel::class);
+            $post_id = $post_model->get_post_id($operation->id, $troop_id);
+            if ($post_id === null) {
+                return;
+            }
+
+            $message = format_operation_report_bbcode($operation, $note_content, $members_with_status);
+            $forum_model = model(ForumModel::class);
+
+            if ($forum_model->update_post($post_id, $message, $current_user_id)) {
+                $post_model->touch_updated($operation->id, $troop_id);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Échec de la mise à jour du rapport sur le forum (opération ' . $operation->id . ', troop ' . $troop_id . ') : ' . $e->getMessage());
+        }
     }
 
     public function index()
@@ -273,6 +333,7 @@ class Operation extends BaseController
 
         $operation_array = (array) $operation;
 
+        $members_with_status = [];
         foreach ($troop['members'] as $member) {
             $status = $_POST[$member->user_id] ?? 'absent';
             if (!in_array($status, OperationModel::STATUSES, true)) {
@@ -280,6 +341,9 @@ class Operation extends BaseController
             }
 
             $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $status);
+
+            $member->status = $status;
+            $members_with_status[] = $member;
         }
 
         $note_content = trim($_POST['note'] ?? '');
@@ -287,6 +351,8 @@ class Operation extends BaseController
             $note_model = model(OperationReportNoteModel::class);
             $note_model->set_note($operation_id, (int) $troop['id'], $note_content, $user['user_id']);
         }
+
+        $this->publish_operation_report($operation, (int) $troop['id'], $members_with_status, $note_content, (int) $user['user_id']);
 
         return redirect('operation_success');
     }
@@ -319,6 +385,11 @@ class Operation extends BaseController
         $points_model = model(PointsModel::class);
         $members = $points_model->get_active_members();
 
+        // Troops dont le rapport ou le compte-rendu a réellement changé lors
+        // de cette correction : seules elles verront leur message forum
+        // republié, pour éviter de "toucher" inutilement les autres.
+        $affected_troop_ids = [];
+
         foreach ($members as $member) {
             $new_status = $_POST[$member->user_id] ?? 'absent';
             if (!in_array($new_status, OperationModel::STATUSES, true)) {
@@ -327,6 +398,7 @@ class Operation extends BaseController
 
             $had_report = array_key_exists($member->user_id, $current_report);
             $old_status = $current_report[$member->user_id] ?? 'absent';
+            $changed = false;
 
             if (!$had_report) {
                 // Un statut laissé sur "absent" (valeur par défaut) pour un membre
@@ -334,12 +406,18 @@ class Operation extends BaseController
                 // rapport que si un autre statut a été choisi.
                 if ($new_status !== 'absent') {
                     $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $new_status);
+                    $changed = true;
                 }
-                continue;
+            } elseif ($new_status !== $old_status) {
+                $operation_model->correct_operation_status($member->user_id, $operation_array, $user['user_id'], $old_status, $new_status);
+                $changed = true;
             }
 
-            if ($new_status !== $old_status) {
-                $operation_model->correct_operation_status($member->user_id, $operation_array, $user['user_id'], $old_status, $new_status);
+            if ($changed) {
+                $member_troop_id = $operation_model->get_member_troop_id(explode(',', (string) $member->secondary_group_ids));
+                if ($member_troop_id !== null) {
+                    $affected_troop_ids[(int) $member_troop_id] = true;
+                }
             }
         }
 
@@ -358,9 +436,39 @@ class Operation extends BaseController
             if ($existing_note === null) {
                 if ($content !== '') {
                     $note_model->set_note($operation_id, (int) $troop_id, $content, $user['user_id']);
+                    $affected_troop_ids[(int) $troop_id] = true;
                 }
             } elseif ($content !== $existing_note->content) {
                 $note_model->update_note($operation_id, (int) $troop_id, $content, $user['user_id']);
+                $affected_troop_ids[(int) $troop_id] = true;
+            }
+        }
+
+        if (!empty($affected_troop_ids)) {
+            $updated_report = $operation_model->get_operation_report($operation_id);
+
+            foreach (array_keys($affected_troop_ids) as $troop_id) {
+                $troop = $troops[$troop_id] ?? null;
+                if ($troop === null) {
+                    continue;
+                }
+
+                $members_with_status = [];
+                foreach ($troop['members'] as $member) {
+                    if (!array_key_exists($member->user_id, $updated_report)) {
+                        continue;
+                    }
+
+                    $member->status = $updated_report[$member->user_id];
+                    $members_with_status[] = $member;
+                }
+
+                if (empty($members_with_status)) {
+                    continue;
+                }
+
+                $note = $note_model->get_note($operation_id, $troop_id);
+                $this->update_operation_report_post($operation, $troop_id, $members_with_status, $note->content ?? '', (int) $user['user_id']);
             }
         }
 

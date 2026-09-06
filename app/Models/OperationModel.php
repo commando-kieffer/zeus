@@ -8,6 +8,19 @@ class OperationModel extends Model
 {
     private const TROOP_REF_ID = [38, 39, 40, 41, 45, 46];
 
+    /**
+     * Sujet du forum où poster le rapport de présence de chaque troop.
+     * Seules les troops actives sur le forum ont un sujet dédié (Troop 2 et
+     * Troop 3 n'en ont pas encore) : une troop absente de cette liste ne
+     * déclenche simplement aucune publication.
+     */
+    public const TROOP_THREAD_ID = [
+        38 => 67, // Troop 1
+        39 => 69, // Troop 8
+        40 => 70, // Troop 9 KG
+        41 => 71, // Troop QG
+    ];
+
     public function __construct()
     {
         parent::__construct();
