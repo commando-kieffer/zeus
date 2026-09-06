@@ -166,11 +166,15 @@ class Operation extends BaseController
             }
         }
 
+        $operation_done = is_operation_done($operation->date);
+
         $vote_model = model(OperationVoteModel::class);
         $presence = $operation_model->get_member_presence($operation_id, $user['user_id']);
         $has_voted = $vote_model->has_voted($operation_id, $user['user_id']);
         $voting_closed = is_voting_closed($operation->date);
-        $can_vote = $presence === 'present' && !$has_voted && !$voting_closed;
+        // Comme pour le rapport de présence, la notation n'ouvre qu'à partir
+        // de 21h le jour de l'opération.
+        $can_vote = $operation_done && $presence === 'present' && !$has_voted && !$voting_closed;
         // Une fois le vote fermé, même un participant qui n'a jamais noté voit
         // le résultat : il ne peut de toute façon plus voter.
         $can_view_averages = $presence !== 'present' || $has_voted || $voting_closed;
@@ -181,7 +185,7 @@ class Operation extends BaseController
             . view('generic/header')
             . view('operation', [
                 'operation' => $operation,
-                'operation_done' => is_operation_done($operation->date),
+                'operation_done' => $operation_done,
                 'is_officer' => is_officer($user),
                 'is_team_leader' => is_team_leader($user),
                 'is_squad_leader' => is_squad_leader($user),
@@ -487,6 +491,10 @@ class Operation extends BaseController
 
         if (empty($operation)) {
             return $this->render_message("L'opération recherchée n'existe pas.");
+        }
+
+        if (!is_operation_done($operation->date)) {
+            return $this->render_message("Vous ne pouvez noter cette opération qu'à partir de 21h le jour de l'opération.");
         }
 
         if (is_voting_closed($operation->date)) {
