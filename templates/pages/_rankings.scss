@@ -1,0 +1,185 @@
+.rankings {
+    .rankings-head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 5rem 0 3rem;
+
+        h1 {
+            font-family: 'MarianneBold';
+            font-size: 54px;
+            background-size: 100%;
+            background-repeat: repeat;
+            color: transparent;
+            background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+            background-clip: text;
+            -webkit-background-clip: text;
+
+            @include bkp(sm) {
+                font-size: 38px;
+            }
+        }
+
+        .rankings-filter select {
+            min-width: 260px;
+        }
+    }
+
+    .podium {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 1.5rem;
+        max-width: 95vw;
+        margin: 0 auto 3rem;
+
+        @include bkp(sm) {
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .podium-spot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 220px;
+            max-width: 100%;
+
+            @include bkp(sm) {
+                width: 90%;
+                max-width: 320px;
+            }
+
+            .podium-cards {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: flex-end;
+                gap: 0.75rem;
+                width: 100%;
+            }
+
+            .podium-entry {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 220px;
+                cursor: pointer;
+
+                .podium-cap {
+                    width: 64px;
+                    margin-bottom: -1.1rem;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .podium-card {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 0.4rem;
+                    width: 100%;
+                    background-color: rgba(255, 255, 255, 0.6);
+                    border-radius: $radius-lg;
+                    box-shadow: $shadow-card;
+                    padding: 1.5rem 1rem;
+                    transition: $transition-base;
+
+                    img.podium-grade {
+                        height: 50px;
+                        border-radius: $radius-sm;
+                    }
+
+                    .podium-name {
+                        font-family: 'MarianneBold';
+                        font-size: 1.1rem;
+                        text-align: center;
+                        word-break: break-word;
+                    }
+
+                    .podium-value {
+                        font-family: 'MarianneRegular';
+                        font-size: 1.3rem;
+                        opacity: 0.8;
+                    }
+                }
+
+                &:hover .podium-card {
+                    box-shadow: $shadow-card-hover;
+                    transform: translateY(-2px);
+                }
+            }
+
+            .podium-step {
+                margin-top: 0.75rem;
+                width: 100%;
+                text-align: center;
+                font-family: 'MarianneBold';
+                font-size: 1.4rem;
+                color: #FFFFFF;
+                border-radius: $radius-sm $radius-sm 0 0;
+                padding: 0.75rem 0;
+                box-sizing: border-box;
+            }
+
+            &.podium-place-1 {
+                order: 2;
+
+                .podium-step {
+                    height: 90px;
+                    background-image: linear-gradient( 109.6deg,  rgba(255,196,42,1) 11.2%, rgba(214,158,20,1) 91.1% );
+                }
+            }
+
+            &.podium-place-2 {
+                order: 1;
+
+                .podium-step {
+                    height: 65px;
+                    background-image: linear-gradient( 109.6deg,  rgba(196,196,204,1) 11.2%, rgba(140,140,150,1) 91.1% );
+                }
+            }
+
+            &.podium-place-3 {
+                order: 3;
+
+                .podium-step {
+                    height: 50px;
+                    background-image: linear-gradient( 109.6deg,  rgba(205,140,90,1) 11.2%, rgba(150,95,50,1) 91.1% );
+                }
+            }
+
+            @include bkp(sm) {
+                &.podium-place-1, &.podium-place-2, &.podium-place-3 {
+                    order: initial;
+
+                    .podium-step {
+                        height: auto;
+                        padding: 0.6rem 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .rankings-list {
+        display: flex;
+        justify-content: center;
+        padding-bottom: 4rem;
+
+        .tfc-container {
+            width: 95vw;
+            max-width: 1100px;
+            min-height: 0;
+
+            table tr td {
+                cursor: pointer;
+            }
+        }
+    }
+}

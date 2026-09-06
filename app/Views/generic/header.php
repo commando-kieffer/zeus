@@ -27,6 +27,7 @@
             <li>
                 <p id="operations-menu">Opérations</p>
             </li>
+            <li><a href="/classements">Classements</a></li>
             <?php if (session("user")['is_staff']) { ?>
                 <li>
                     <p id="points">Points</p>
