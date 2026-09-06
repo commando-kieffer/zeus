@@ -30,6 +30,7 @@ class OperationVoteModel extends Model
     {
         parent::__construct();
         $this->table = "-";
+        helper('date');
     }
 
     public function has_voted($operation_id, $member_id): bool
@@ -107,12 +108,15 @@ class OperationVoteModel extends Model
      * (utilisé pour les cartes de l'accueil et de la liste des opérations) :
      * operation_id => moyennes, uniquement pour les opérations où ce membre
      * est autorisé à voir la moyenne (cf. get_visible_averages_for_member)
-     * et qui ont déjà reçu au moins un vote.
+     * et qui ont déjà reçu au moins un vote. Prend des objets opération
+     * complets (pas de simples IDs) car la date est nécessaire pour savoir
+     * si le vote est encore ouvert.
      */
-    public function get_visible_averages_for_member($member_id, array $operation_ids)
+    public function get_visible_averages_for_member($member_id, array $operations)
     {
-        if (empty($operation_ids)) return [];
+        if (empty($operations)) return [];
 
+        $operation_ids = array_map(fn($op) => $op->id, $operations);
         $averages = $this->get_averages_for_operations($operation_ids);
 
         $placeholders = implode(',', array_fill(0, count($operation_ids), '?'));
@@ -127,14 +131,16 @@ class OperationVoteModel extends Model
         $voted_ids = $this->get_voted_operation_ids($member_id, $operation_ids);
 
         $visible = [];
-        foreach ($operation_ids as $operation_id) {
-            $is_present = $presence[$operation_id] ?? false;
-            $has_voted = in_array($operation_id, $voted_ids);
-            $can_view = !($is_present && !$has_voted);
-            $row = $averages[$operation_id] ?? null;
+        foreach ($operations as $operation) {
+            $is_present = $presence[$operation->id] ?? false;
+            $has_voted = in_array($operation->id, $voted_ids);
+            // Une fois le vote fermé, même un participant qui n'a jamais noté
+            // voit le résultat : il ne peut de toute façon plus voter.
+            $can_view = !($is_present && !$has_voted) || is_voting_closed($operation->date);
+            $row = $averages[$operation->id] ?? null;
 
             if ($can_view && $row !== null && (int) $row->voter_count > 0) {
-                $visible[$operation_id] = $row;
+                $visible[$operation->id] = $row;
             }
         }
 

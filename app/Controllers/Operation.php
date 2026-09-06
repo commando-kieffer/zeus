@@ -57,8 +57,7 @@ class Operation extends BaseController
         $vote_model = model(OperationVoteModel::class);
         $operations = $operation_model->get_all_operations();
 
-        $operation_ids = array_map(fn($op) => $op->id, $operations);
-        $visible_averages = $vote_model->get_visible_averages_for_member(session('user')['user_id'], $operation_ids);
+        $visible_averages = $vote_model->get_visible_averages_for_member(session('user')['user_id'], $operations);
 
         return view('generic/head')
             . view('generic/header')
@@ -110,8 +109,11 @@ class Operation extends BaseController
         $vote_model = model(OperationVoteModel::class);
         $presence = $operation_model->get_member_presence($operation_id, $user['user_id']);
         $has_voted = $vote_model->has_voted($operation_id, $user['user_id']);
-        $can_vote = $presence === 'present' && !$has_voted;
-        $can_view_averages = $presence !== 'present' || $has_voted;
+        $voting_closed = is_voting_closed($operation->date);
+        $can_vote = $presence === 'present' && !$has_voted && !$voting_closed;
+        // Une fois le vote fermé, même un participant qui n'a jamais noté voit
+        // le résultat : il ne peut de toute façon plus voter.
+        $can_view_averages = $presence !== 'present' || $has_voted || $voting_closed;
 
         $note_model = model(OperationReportNoteModel::class);
 
@@ -377,6 +379,10 @@ class Operation extends BaseController
 
         if (empty($operation)) {
             return $this->render_message("L'opération recherchée n'existe pas.");
+        }
+
+        if (is_voting_closed($operation->date)) {
+            return $this->render_message("La période de notation de cette opération est terminée (deux semaines après l'opération).");
         }
 
         $vote_model = model(OperationVoteModel::class);

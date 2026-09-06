@@ -31,8 +31,8 @@ class Home extends BaseController
         $last_operation = $operation_model->get_last_operation();
         $next_operation = $operation_model->get_next_operation();
 
-        $operation_ids = array_map(fn($op) => $op->id, array_filter([$last_operation, $next_operation]));
-        $visible_averages = $vote_model->get_visible_averages_for_member(session('user')['user_id'], $operation_ids);
+        $operations = array_filter([$last_operation, $next_operation]);
+        $visible_averages = $vote_model->get_visible_averages_for_member(session('user')['user_id'], $operations);
 
         return view('generic/head')
             . view('generic/header')
