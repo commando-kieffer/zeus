@@ -188,6 +188,22 @@
 				}
 			}
 		}
+
+		.histo-pagination {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 1.5rem;
+			margin-top: 2rem;
+
+			span {
+				font-family: 'MarianneThin';
+				font-size: 0.95rem;
+				opacity: 0.7;
+			}
+		}
 	}
 
 	.profil-medaille {
@@ -244,6 +260,17 @@
 					font-family: 'MarianneThin';
 					font-size: 0.8rem;
 					display: hidden;
+				}
+				.pm-date {
+					font-family: 'MarianneThin';
+					font-size: 0.75rem;
+					opacity: 0.6;
+				}
+				.pm-attribution {
+					font-style: italic;
+					opacity: 0.85;
+					border-top: 1px solid rgba(15, 14, 51, 0.12);
+					padding-top: 0.5rem;
 				}
 			}
 		}

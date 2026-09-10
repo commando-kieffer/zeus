@@ -184,6 +184,26 @@ class OperationModel extends Model
     }
 
     /**
+     * Troop de chaque membre rapporté telle qu'enregistrée au moment du
+     * rapport : member_id => troop_id (ou null pour une ligne dont la troop
+     * n'a pas pu être déterminée). C'est cette troop "historique" qui fait
+     * foi à l'affichage, pas l'appartenance actuelle du membre : un membre
+     * parti ou ayant changé de troop reste dans la troop qu'il avait alors.
+     */
+    public function get_report_troop_map($operation_id)
+    {
+        $query = "SELECT member_id, troop_id FROM operation_report WHERE operation_id = ?";
+        $result = $this->db->query($query, array($operation_id));
+
+        $map = [];
+        foreach ($result->getResult() as $row) {
+            $map[$row->member_id] = $row->troop_id === null ? null : (int) $row->troop_id;
+        }
+
+        return $map;
+    }
+
+    /**
      * Statut de présence d'un membre pour une opération donnée : 'present',
      * 'absent', 'unjustified', ou null (aucun rapport pour ce membre).
      */
@@ -199,12 +219,13 @@ class OperationModel extends Model
     /**
      * Premier rapport d'un membre pour une opération (aucune ligne
      * operation_report préexistante). $status doit être une valeur de
-     * self::STATUSES.
+     * self::STATUSES. $troop_id est la troop du membre au moment du rapport
+     * (figée : elle ne suit pas ses changements de troop ultérieurs).
      */
-    public function record_operation_status($member_id, $operation, $reported_by, string $status)
+    public function record_operation_status($member_id, $operation, $reported_by, string $status, ?int $troop_id = null)
     {
-        $query = "INSERT INTO operation_report (operation_id, member_id, status, reported_by, reported_at) VALUES (?, ?, ?, ?, NOW())";
-        $this->db->query($query, array($operation["id"], $member_id, $status, $reported_by));
+        $query = "INSERT INTO operation_report (operation_id, member_id, troop_id, status, reported_by, reported_at) VALUES (?, ?, ?, ?, ?, NOW())";
+        $this->db->query($query, array($operation["id"], $member_id, $troop_id, $status, $reported_by));
 
         $effect = self::STATUS_EFFECT[$status];
 

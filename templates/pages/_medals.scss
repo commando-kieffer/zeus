@@ -116,6 +116,24 @@
             box-sizing: border-box;
         }
 
+        .medal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-top: 1rem;
+
+            span {
+                font-family: 'MarianneBold';
+                font-size: 13px;
+            }
+
+            input, textarea {
+                width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+        }
+
         .medal-options {
             max-height: 200px;
             overflow-y: auto;

@@ -68,8 +68,7 @@
         <?php } ?>
             <div class="operation-report-grid">
                 <?php foreach ($report_troops as $troop) { if (!empty($troop['members'])) {
-                    $is_real_troop = $troop['id'] !== 'former';
-                    $can_view_note = $is_real_troop && ($is_team_leader || ($is_squad_leader && $own_troop_id !== null && (int) $own_troop_id === (int) $troop['id']));
+                    $can_view_note = $is_team_leader || ($is_squad_leader && $own_troop_id !== null && (int) $own_troop_id === (int) $troop['id']);
                     $note = $report_notes[(int) $troop['id']] ?? null;
                 ?>
                 <div class="tfc-container">
@@ -95,13 +94,13 @@
                             <th>Présence</th>
                         </tr>
                         <?php foreach ($troop['members'] as $member) {
-                            $status = $report_map[$member->user_id] ?? 'absent';
+                            $status = $member->status;
                         ?>
                         <tr class="tfcc-member">
                             <td class="<?php echo $status !== 'present' ? 'member-name-' . $status : '' ?>"><?php echo $member->username ?></td>
                             <td><img src="/pictures/jackets/<?php echo $member->user_group_id ?>.png" alt=""></td>
                             <td>
-                                <select name="<?php echo $member->user_id ?>" <?php echo $is_officer ? '' : 'disabled' ?>>
+                                <select name="<?php echo $member->user_id ?>" <?php echo ($is_officer && $member->editable) ? '' : 'disabled' ?>>
                                     <?php foreach (['present' => 'Présent', 'absent' => 'Absent', 'unjustified' => 'Absence injustifiée'] as $value => $label) { ?>
                                     <option value="<?php echo $value ?>" <?php echo $status === $value ? 'selected' : '' ?>><?php echo $label ?></option>
                                     <?php } ?>

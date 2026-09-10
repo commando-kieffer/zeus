@@ -69,6 +69,16 @@ class ProfileModel extends Model
         return $result->getResult()[0];
     }
 
+    /**
+     * Date d'entrée du membre (infos_recrutement.date, jointe sur user_id),
+     * ou null pour un compte antérieur au suivi des recrutements.
+     */
+    public function get_profil_joined_at($user_id) {
+        $query = "SELECT date FROM infos_recrutement WHERE user_id = ?";
+        $row = $this->db->query($query, array($user_id))->getResult()[0] ?? null;
+        return $row === null ? null : $row->date;
+    }
+
     public function get_profil_troop_bordee_spe($secondary_group_ids) {
         $troop_bordee_spe = [
             'troop' => $this->extract_troop($secondary_group_ids),
@@ -179,7 +189,7 @@ class ProfileModel extends Model
     }
 
     public function extract_user_medal_id($user_id) {
-        $query = "SELECT id_medal FROM medal_attribut WHERE id_user = ?";
+        $query = "SELECT id_medal, description AS attribution_description, `date` AS attribution_date FROM medal_attribut WHERE id_user = ?";
         $result = $this->db->query($query, array($user_id));
 
         return $result->getResult();
@@ -187,10 +197,19 @@ class ProfileModel extends Model
 
     public function extract_user_medal($medals_array) {
         $medals_list = [];
-        foreach ($medals_array as $medal) {
+        foreach ($medals_array as $attribut) {
             $query = "SELECT name, title, description FROM medal WHERE id = ?";
-            $result = $this->db->query($query, array($medal->id_medal));
-            array_push($medals_list, $result->getResult());
+            $rows = $this->db->query($query, array($attribut->id_medal))->getResult();
+            if (empty($rows)) {
+                continue;
+            }
+
+            // Complément propre à cette attribution (page de profil uniquement) :
+            // date de remise et description spécifique, en plus de la description
+            // générique de la médaille.
+            $rows[0]->attribution_description = $attribut->attribution_description;
+            $rows[0]->attribution_date = $attribut->attribution_date;
+            array_push($medals_list, $rows);
         }
 
         return $medals_list;

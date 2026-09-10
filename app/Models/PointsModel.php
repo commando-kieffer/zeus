@@ -142,6 +142,16 @@ class PointsModel extends Model
         return $troops_members_list;
     }
 
+    /**
+     * Nombre total de lignes d'historique de points d'un membre, pour la
+     * pagination de l'historique sur la page de profil.
+     */
+    public function get_history_count(int $user_id): int
+    {
+        $query = "SELECT COUNT(*) AS total FROM panel_points_hist WHERE user_id = ?";
+        return (int) $this->db->query($query, [$user_id])->getResult()[0]->total;
+    }
+
     public function get_history(int $user_id, int $page = 0)
     {
         $skip = 10 * $page;

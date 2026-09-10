@@ -57,6 +57,14 @@
                     </li>
                     <?php }} ?>
                 </ul>
+                <label class="medal-field">
+                    <span>Date d'attribution</span>
+                    <input type="date" name="medal_date" value="<?php echo esc($default_medal_date) ?>">
+                </label>
+                <label class="medal-field">
+                    <span>Description</span>
+                    <textarea name="medal_description" rows="3" placeholder="Laisser vide pour utiliser la description par défaut de la médaille"></textarea>
+                </label>
 
                 <h3>Retirer une médaille</h3>
                 <ul class="medal-options">

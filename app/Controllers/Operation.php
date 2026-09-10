@@ -142,29 +142,69 @@ class Operation extends BaseController
         $user = session('user');
 
         $points_model = model(PointsModel::class);
-        $report_troops = $points_model->get_active_members_by_troop($points_model->get_active_members());
-        $report_map = $operation_model->get_operation_report($operation_id);
 
-        // Un membre rapporté (présent ou absent) doit rester visible même s'il
-        // n'appartient plus aux membres actifs (parti du commando, changé de
-        // troop...) : on complète les troops avec les membres manquants.
-        $known_ids = [];
-        foreach ($report_troops as $troop) {
+        $report_map = $operation_model->get_operation_report($operation_id);        // member_id => statut
+        $report_troop_map = $operation_model->get_report_troop_map($operation_id);  // member_id => troop_id figée
+
+        $active_members = $points_model->get_active_members();
+        $active_by_troop = $points_model->get_active_members_by_troop($active_members);
+        $active_ids = array_map(fn($member) => (int) $member->user_id, $active_members);
+
+        // Détails (pseudo, grade...) de tous les membres rapportés, y compris
+        // ceux qui ont quitté le commando : non filtrés sur l'appartenance active.
+        $reported_details = [];
+        foreach ($operation_model->get_members_by_ids(array_map('intval', array_keys($report_map))) as $detail) {
+            $reported_details[(int) $detail->user_id] = $detail;
+        }
+
+        $by_rank_desc = fn($a, $b) => $b->user_group_id <=> $a->user_group_id;
+
+        // Chaque troop regroupe : les membres rapportés dont la troop figée est
+        // celle-ci (qu'ils soient encore là ou non, qu'ils aient changé de troop
+        // depuis ou non), puis les membres actuellement dans la troop et pas
+        // encore rapportés (affichés "absent" par défaut).
+        $report_troops = [];
+        foreach ($active_by_troop as $troop_id => $troop) {
+            $members = [];
+
+            foreach ($report_map as $member_id => $status) {
+                if ((int) ($report_troop_map[$member_id] ?? 0) !== (int) $troop_id) {
+                    continue;
+                }
+                $detail = $reported_details[(int) $member_id] ?? null;
+                if ($detail === null) {
+                    continue;
+                }
+                $detail->status = $status;
+                $detail->editable = in_array((int) $member_id, $active_ids, true);
+                $members[] = $detail;
+            }
+
             foreach ($troop['members'] as $member) {
-                $known_ids[] = (int) $member->user_id;
+                if (array_key_exists($member->user_id, $report_map)) {
+                    continue;
+                }
+                $member->status = 'absent';
+                $member->editable = true;
+                $members[] = $member;
             }
-        }
-        $missing_ids = array_diff(array_map('intval', array_keys($report_map)), $known_ids);
-        if (!empty($missing_ids)) {
-            $former_members = $operation_model->get_members_by_ids(array_values($missing_ids));
-            if (!empty($former_members)) {
-                $report_troops['former'] = [
-                    'title' => 'ANCIENS MEMBRES',
-                    'id' => 'former',
-                    'members' => $former_members,
-                ];
+
+            if (empty($members)) {
+                continue;
             }
+
+            usort($members, $by_rank_desc);
+            $report_troops[$troop_id] = [
+                'title' => $troop['title'],
+                'id' => (string) $troop_id,
+                'members' => $members,
+            ];
         }
+
+        // Les lignes de rapport dont la troop figée est nulle ou inconnue (une
+        // opération d'avant cette fonctionnalité pour laquelle la reprise de
+        // données n'a rien pu déduire) sont volontairement ignorées : le membre
+        // n'apparaît nulle part plutôt que dans une catégorie « sans troop ».
 
         $operation_done = is_operation_done($operation->date);
 
@@ -344,7 +384,7 @@ class Operation extends BaseController
                 $status = 'absent';
             }
 
-            $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $status);
+            $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $status, (int) $troop['id']);
 
             $member->status = $status;
             $members_with_status[] = $member;
@@ -385,6 +425,7 @@ class Operation extends BaseController
 
         $operation_array = (array) $operation;
         $current_report = $operation_model->get_operation_report($operation_id);
+        $report_troop_map = $operation_model->get_report_troop_map($operation_id);
 
         $points_model = model(PointsModel::class);
         $members = $points_model->get_active_members();
@@ -402,26 +443,27 @@ class Operation extends BaseController
 
             $had_report = array_key_exists($member->user_id, $current_report);
             $old_status = $current_report[$member->user_id] ?? 'absent';
-            $changed = false;
+            $current_troop_id = $operation_model->get_member_troop_id(explode(',', (string) $member->secondary_group_ids));
+            $affected_troop_id = null;
 
             if (!$had_report) {
                 // Un statut laissé sur "absent" (valeur par défaut) pour un membre
                 // jamais rapporté n'est pas une modification : on ne crée un
-                // rapport que si un autre statut a été choisi.
+                // rapport que si un autre statut a été choisi. La troop figée
+                // du membre est alors sa troop actuelle.
                 if ($new_status !== 'absent') {
-                    $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $new_status);
-                    $changed = true;
+                    $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $new_status, $current_troop_id);
+                    $affected_troop_id = $current_troop_id;
                 }
             } elseif ($new_status !== $old_status) {
                 $operation_model->correct_operation_status($member->user_id, $operation_array, $user['user_id'], $old_status, $new_status);
-                $changed = true;
+                // Le rapport (et son sujet forum) appartient à la troop figée
+                // du membre, pas à celle qu'il occupe éventuellement aujourd'hui.
+                $affected_troop_id = $report_troop_map[$member->user_id] ?? $current_troop_id;
             }
 
-            if ($changed) {
-                $member_troop_id = $operation_model->get_member_troop_id(explode(',', (string) $member->secondary_group_ids));
-                if ($member_troop_id !== null) {
-                    $affected_troop_ids[(int) $member_troop_id] = true;
-                }
+            if ($affected_troop_id !== null) {
+                $affected_troop_ids[(int) $affected_troop_id] = true;
             }
         }
 
@@ -450,21 +492,28 @@ class Operation extends BaseController
 
         if (!empty($affected_troop_ids)) {
             $updated_report = $operation_model->get_operation_report($operation_id);
+            $updated_troop_map = $operation_model->get_report_troop_map($operation_id);
+
+            $reported_details = [];
+            foreach ($operation_model->get_members_by_ids(array_map('intval', array_keys($updated_report))) as $detail) {
+                $reported_details[(int) $detail->user_id] = $detail;
+            }
 
             foreach (array_keys($affected_troop_ids) as $troop_id) {
-                $troop = $troops[$troop_id] ?? null;
-                if ($troop === null) {
-                    continue;
-                }
-
+                // Le rapport forum d'une troop rassemble les membres dont la
+                // troop figée est celle-ci (départs et changements de troop
+                // ultérieurs inclus), pas l'effectif actuel de la troop.
                 $members_with_status = [];
-                foreach ($troop['members'] as $member) {
-                    if (!array_key_exists($member->user_id, $updated_report)) {
+                foreach ($updated_report as $member_id => $status) {
+                    if ((int) ($updated_troop_map[$member_id] ?? 0) !== (int) $troop_id) {
                         continue;
                     }
-
-                    $member->status = $updated_report[$member->user_id];
-                    $members_with_status[] = $member;
+                    $detail = $reported_details[(int) $member_id] ?? null;
+                    if ($detail === null) {
+                        continue;
+                    }
+                    $detail->status = $status;
+                    $members_with_status[] = $detail;
                 }
 
                 if (empty($members_with_status)) {

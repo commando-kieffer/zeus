@@ -47,10 +47,16 @@ class MedalModel extends Model
         return $result->getResult()[0]->total > 0;
     }
 
-    public function add_medal($member_id, $medal_id)
+    /**
+     * Attribue une médaille à un membre. $description est le texte affiché en
+     * complément de la description générique de la médaille sur la page de
+     * profil (null pour n'afficher que la description générique) ; $date est la
+     * date d'attribution au format Y-m-d.
+     */
+    public function add_medal($member_id, $medal_id, ?string $description = null, ?string $date = null)
     {
-        $query = "INSERT INTO medal_attribut (id_medal, id_user) VALUES (?, ?)";
-        $this->db->query($query, array($medal_id, $member_id));
+        $query = "INSERT INTO medal_attribut (id_medal, id_user, description, `date`) VALUES (?, ?, ?, ?)";
+        $this->db->query($query, array($medal_id, $member_id, $description, $date));
     }
 
     public function remove_medal($member_id, $medal_id)

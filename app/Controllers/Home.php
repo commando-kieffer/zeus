@@ -85,12 +85,16 @@ class Home extends BaseController
         $profil = [
             'grade' => $profil_model->get_profil_title($user['user_group_id']),
             'stats' => $profil_model->get_profil_stats($user['user_id']),
+            'joined_at' => $profil_model->get_profil_joined_at($user['user_id']),
             'troop_bordee_spe' => $profil_model->get_profil_troop_bordee_spe($user['secondary_group_ids']),
             'metiers' => $profil_model->get_profil_metier($user['secondary_group_ids']),
             'medailles' => $profil_model->get_profil_medal($user['user_id']),
         ];
 
-        $points_history = $points_model->get_history($user['user_id']);
+        $history_page = max(0, (int) ($_GET['page'] ?? 0));
+        $history_page_count = max(1, (int) ceil($points_model->get_history_count($user['user_id']) / 10));
+        $history_page = min($history_page, $history_page_count - 1);
+        $points_history = $points_model->get_history($user['user_id'], $history_page);
 
         return view('generic/head')
             . view('generic/header')
@@ -98,7 +102,10 @@ class Home extends BaseController
                 'is_own_profile' => $is_own_profile,
                 'user' => $user,
                 'profil' => $profil,
-                'points_history' => $points_history
+                'points_history' => $points_history,
+                'history_page' => $history_page,
+                'history_page_count' => $history_page_count,
+                'profil_base_url' => $is_own_profile ? '/profil' : '/profil/' . $user['user_id'],
             ])
             . view('generic/footer')
             . view('generic/foot');

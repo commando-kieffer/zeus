@@ -28,6 +28,19 @@ class Medal extends BaseController
             . view('generic/foot');
     }
 
+    /**
+     * Date du dernier vendredi précédant strictement aujourd'hui (format
+     * Y-m-d) : valeur par défaut de la date d'attribution d'une médaille, les
+     * décorations étant généralement remises lors du training du vendredi.
+     */
+    private function last_friday(): string
+    {
+        $date = new \DateTime('today');
+        $offset = ((int) $date->format('N') - 5 + 7) % 7; // N : 1 (lun.) .. 7 (dim.), vendredi = 5
+        $date->modify('-' . ($offset === 0 ? 7 : $offset) . ' days');
+        return $date->format('Y-m-d');
+    }
+
     public function index()
     {
         if (!is_team_leader(session('user'))) {
@@ -52,6 +65,7 @@ class Medal extends BaseController
                 'members_by_troop' => $members_by_troop,
                 'all_medals' => $medal_model->get_all_medals(),
                 'medals_by_member' => $medal_model->get_medal_ids_by_member($member_ids),
+                'default_medal_date' => $this->last_friday(),
             ])
             . view('generic/footer')
             . view('generic/foot');
@@ -76,6 +90,8 @@ class Medal extends BaseController
         $rules = [
             'member_id' => 'required|in_list[' . implode(',', $valid_member_ids) . ']',
             'medal_id' => 'required|in_list[' . implode(',', $valid_medal_ids) . ']',
+            'medal_description' => 'permit_empty|string',
+            'medal_date' => 'permit_empty|valid_date[Y-m-d]',
         ];
 
         if (!$this->validate($rules)) {
@@ -88,7 +104,12 @@ class Medal extends BaseController
         if ($medal_model->member_has_medal($member_id, $medal_id)) {
             $medal_model->remove_medal($member_id, $medal_id);
         } else {
-            $medal_model->add_medal($member_id, $medal_id);
+            $description = trim((string) ($_POST['medal_description'] ?? ''));
+            $date = $_POST['medal_date'] ?? '';
+            if ($date === '') {
+                $date = $this->last_friday();
+            }
+            $medal_model->add_medal($member_id, $medal_id, $description === '' ? null : $description, $date);
         }
 
         return redirect()->to('/medals');
