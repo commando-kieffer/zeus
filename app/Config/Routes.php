@@ -33,6 +33,7 @@ $routes->get('/operations/(:num)', 'Operation::show/$1');
 $routes->get('/upload/galerie', 'Upload::gallery');
 $routes->get('/medals', 'Medal::index');
 $routes->get('/classements', 'Ranking::index');
+$routes->get('/statistiques', 'Statistics::index');
 
 $routes->post('/login', 'Login::api_login');
 $routes->post('/points/add_correct_point', 'Training::add_correct_point');
