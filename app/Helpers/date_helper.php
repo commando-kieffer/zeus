@@ -28,6 +28,19 @@ if (!function_exists('is_operation_done')) {
     }
 }
 
+if (!function_exists('is_today')) {
+    /**
+     * Vrai si la date donnée (format Y-m-d) est le jour courant, heure de
+     * Paris (comme is_operation_done() et is_voting_closed()), quelle que
+     * soit l'heure ou le fuseau du serveur (l'application tourne en UTC).
+     */
+    function is_today(string $date): bool
+    {
+        $paris = new DateTimeZone('Europe/Paris');
+        return (new DateTime('today', $paris))->format('Y-m-d') === $date;
+    }
+}
+
 if (!function_exists('is_voting_closed')) {
     /**
      * Le vote sur le scénario d'une opération se ferme deux semaines après

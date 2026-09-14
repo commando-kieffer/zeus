@@ -68,7 +68,9 @@
         <?php } ?>
             <div class="operation-report-grid">
                 <?php foreach ($report_troops as $troop) { if (!empty($troop['members'])) {
-                    $can_view_note = $is_team_leader || ($is_squad_leader && $own_troop_id !== null && (int) $own_troop_id === (int) $troop['id']);
+                    // Chefs de troop (QM) et état-major consultent le compte-rendu
+                    // de toutes les troops, pas seulement de la leur.
+                    $can_view_note = $is_team_leader || $is_squad_leader;
                     $note = $report_notes[(int) $troop['id']] ?? null;
                 ?>
                 <div class="tfc-container">

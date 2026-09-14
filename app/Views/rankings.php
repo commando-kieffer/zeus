@@ -7,6 +7,10 @@
                 <option value="<?php echo $key ?>" <?php echo $key === $ranking ? 'selected' : '' ?>><?php echo esc($def['label']) ?></option>
                 <?php } ?>
             </select>
+            <label class="rankings-hide-leaders">
+                <input type="checkbox" name="hide_team_leaders" value="1" onchange="this.form.submit()" <?php echo $hide_team_leaders ? 'checked' : '' ?>>
+                Masquer l'état-major
+            </label>
         </form>
     </section>
 
@@ -47,7 +51,7 @@
                     <th>Date d'adhésion</th>
                 </tr>
                 <?php foreach ($rest as $entry) { $member = $entry['member']; ?>
-                <tr class="member" onclick="window.location.href = '/profil/<?php echo $member->user_id ?>'">
+                <tr class="member<?php echo (int) $member->user_id === $current_user_id ? ' current-user' : '' ?>" onclick="window.location.href = '/profil/<?php echo $member->user_id ?>'">
                     <td><?php echo $entry['rank'] ?></td>
                     <td><?php echo esc($member->username) ?></td>
                     <td><img src="/pictures/jackets/<?php echo $member->user_group_id ?>.png" alt=""></td>

@@ -1,8 +1,10 @@
 <main class="training">
     <?php if (empty($operations)) { ?>
-    <div class="tf-head">
-        <h1>Rapport de présence</h1>
-        <p>Aucune opération n'est en attente d'un rapport pour votre troop.</p>
+    <div class="training-form">
+        <div class="tf-head">
+            <h1>Rapport de présence</h1>
+            <p class="tf-empty-message">Aucune opération n'est en attente d'un rapport pour votre troop.</p>
+        </div>
     </div>
     <?php } else { ?>
     <form action="#" class="training-form" id="select-operation-form">

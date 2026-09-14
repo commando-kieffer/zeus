@@ -19,6 +19,8 @@ class Home extends BaseController
             throw new RedirectException('login');
             exit;
         }
+
+        helper('date');
     }
 
     public function index(): string
@@ -40,6 +42,7 @@ class Home extends BaseController
                 'members' => $members,
                 'last_operation' => $last_operation,
                 'next_operation' => $next_operation,
+                'next_operation_today' => !empty($next_operation) && is_today($next_operation->date),
                 'visible_averages' => $visible_averages,
                 'vote_criteria_short' => OperationVoteModel::CRITERIA_SHORT,
             ])

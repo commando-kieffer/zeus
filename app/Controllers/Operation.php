@@ -229,7 +229,6 @@ class Operation extends BaseController
                 'is_officer' => is_officer($user),
                 'is_team_leader' => is_team_leader($user),
                 'is_squad_leader' => is_squad_leader($user),
-                'own_troop_id' => $operation_model->get_member_troop_id($user['secondary_group_ids']),
                 'report_troops' => $report_troops,
                 'report_map' => $report_map,
                 'report_notes' => $note_model->get_notes_for_operation($operation_id),

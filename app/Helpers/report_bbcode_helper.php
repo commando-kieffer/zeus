@@ -132,11 +132,10 @@ if (!function_exists('report_bbcode_member_list')) {
 
 if (!function_exists('report_bbcode_rank_shorthand')) {
     /**
-     * Abréviation de grade (convention Marine nationale) affichée devant le
+     * Abréviation de grade affichée devant le
      * pseudo dans la liste nominative, ex. "Qm2" pour "Quartier-maître de
      * seconde classe". xf_user_group ne stocke que le titre complet, d'où
-     * cette table de correspondance dédiée - à ajuster si un grade a une
-     * abréviation "maison" différente de la convention standard.
+     * cette table de correspondance dédiée.
      */
     function report_bbcode_rank_shorthand(int $user_group_id): string
     {
@@ -158,7 +157,6 @@ if (!function_exists('report_bbcode_rank_shorthand')) {
             19 => 'Lv',
             20 => 'CptC',
             50 => 'Asp',
-            54 => 'Rsv',
         ];
 
         return $shorthands[$user_group_id] ?? '';

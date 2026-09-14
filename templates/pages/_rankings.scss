@@ -21,8 +21,30 @@
             }
         }
 
-        .rankings-filter select {
-            min-width: 260px;
+        .rankings-filter {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 1.25rem;
+
+            select {
+                min-width: 260px;
+            }
+
+            .rankings-hide-leaders {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-family: 'SpectralLight';
+                font-size: 13px;
+                cursor: pointer;
+
+                input[type="checkbox"] {
+                    cursor: pointer;
+                }
+            }
         }
     }
 
@@ -179,6 +201,11 @@
 
             table tr td {
                 cursor: pointer;
+            }
+
+            // Repère la ligne du membre connecté quand il n'est pas sur le podium.
+            table tr.current-user td {
+                background-color: rgba(97, 189, 109, 0.18);
             }
         }
     }

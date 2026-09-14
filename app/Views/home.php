@@ -25,8 +25,8 @@
             <?php } ?>
             <?php if (!empty($next_operation)) { ?>
             <a class="operation-card" href="/operations/<?php echo $next_operation->id ?>">
-                <h2>Prochaine opération : <?php echo esc($next_operation->name) ?></h2>
-                <p><?php echo (new DateTime($next_operation->date))->format('d/m/Y') ?></p>
+                <h2><?php echo $next_operation_today ? "Aujourd'hui" : 'Prochaine opération' ?> : <?php echo esc($next_operation->name) ?></h2>
+                <p><?php echo $next_operation_today ? "Aujourd'hui" : (new DateTime($next_operation->date))->format('d/m/Y') ?></p>
                 <p><?php echo esc($next_operation->location) ?></p>
                 <?php if (!empty($next_operation->scenarist_name)) { ?>
                 <p class="operation-scenarist">Par <?php echo esc($next_operation->scenarist_name) ?></p>

@@ -64,11 +64,15 @@ class OperationModel extends Model
     }
 
     /**
-     * Prochaine opération à venir (date la plus proche après aujourd'hui).
+     * Prochaine opération à venir : la plus proche à partir d'aujourd'hui
+     * inclus, pour qu'une opération qui a lieu aujourd'hui même reste
+     * affichée (plutôt que de disparaître, n'étant plus "à venir" mais pas
+     * encore "passée") jusqu'à ce qu'elle devienne la dernière opération le
+     * lendemain.
      */
     public function get_next_operation()
     {
-        $query = self::OPERATION_SELECT . " WHERE o.date > CURDATE() ORDER BY o.date ASC LIMIT 1";
+        $query = self::OPERATION_SELECT . " WHERE o.date >= CURDATE() ORDER BY o.date ASC LIMIT 1";
         $result = $this->db->query($query);
         $rows = $result->getResult();
         return $rows[0] ?? null;

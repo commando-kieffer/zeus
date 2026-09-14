@@ -29,7 +29,19 @@ class Ranking extends BaseController
             $ranking = array_key_first(RankingModel::RANKINGS);
         }
 
-        $members = $ranking_model->sort_members($ranking_model->get_members_with_stats(), $ranking);
+        $hide_team_leaders = !empty($_GET['hide_team_leaders']);
+
+        $members = $ranking_model->get_members_with_stats();
+        if ($hide_team_leaders) {
+            // L'état-major (chefs de troop exclus, cf. is_team_leader) peut être
+            // masqué du classement pour ne comparer que les membres de troop.
+            $members = array_values(array_filter(
+                $members,
+                fn($member) => !is_team_leader(['user_group_id' => $member->user_group_id])
+            ));
+        }
+
+        $members = $ranking_model->sort_members($members, $ranking);
         $ranks = $ranking_model->compute_ranks($members, $ranking);
 
         // Deux membres ex-aequo partagent le même rang (voir compute_ranks) :
@@ -57,6 +69,8 @@ class Ranking extends BaseController
                 'is_negative' => RankingModel::RANKINGS[$ranking]['negative'],
                 'podium_steps' => $podium_steps,
                 'rest' => $rest,
+                'hide_team_leaders' => $hide_team_leaders,
+                'current_user_id' => (int) session('user')['user_id'],
             ])
             . view('generic/footer')
             . view('generic/foot');

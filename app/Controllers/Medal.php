@@ -29,15 +29,17 @@ class Medal extends BaseController
     }
 
     /**
-     * Date du dernier vendredi précédant strictement aujourd'hui (format
-     * Y-m-d) : valeur par défaut de la date d'attribution d'une médaille, les
+     * Date du vendredi le plus récent, aujourd'hui inclus (format Y-m-d) :
+     * valeur par défaut de la date d'attribution d'une médaille, les
      * décorations étant généralement remises lors du training du vendredi.
+     * Si on est déjà vendredi, c'est donc aujourd'hui, pas le vendredi
+     * précédent.
      */
-    private function last_friday(): string
+    private function default_medal_date(): string
     {
         $date = new \DateTime('today');
         $offset = ((int) $date->format('N') - 5 + 7) % 7; // N : 1 (lun.) .. 7 (dim.), vendredi = 5
-        $date->modify('-' . ($offset === 0 ? 7 : $offset) . ' days');
+        $date->modify('-' . $offset . ' days');
         return $date->format('Y-m-d');
     }
 
@@ -65,7 +67,7 @@ class Medal extends BaseController
                 'members_by_troop' => $members_by_troop,
                 'all_medals' => $medal_model->get_all_medals(),
                 'medals_by_member' => $medal_model->get_medal_ids_by_member($member_ids),
-                'default_medal_date' => $this->last_friday(),
+                'default_medal_date' => $this->default_medal_date(),
             ])
             . view('generic/footer')
             . view('generic/foot');
@@ -107,7 +109,7 @@ class Medal extends BaseController
             $description = trim((string) ($_POST['medal_description'] ?? ''));
             $date = $_POST['medal_date'] ?? '';
             if ($date === '') {
-                $date = $this->last_friday();
+                $date = $this->default_medal_date();
             }
             $medal_model->add_medal($member_id, $medal_id, $description === '' ? null : $description, $date);
         }
