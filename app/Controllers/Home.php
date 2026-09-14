@@ -8,6 +8,8 @@ use \App\Models\ProfileModel;
 use \App\Models\PointsModel;
 use \App\Models\OperationModel;
 use \App\Models\OperationVoteModel;
+use \App\Models\PanelUserModel;
+use \App\Models\MetierModel;
 
 class Home extends BaseController
 {
@@ -28,8 +30,28 @@ class Home extends BaseController
         $points_model = model(PointsModel::class);
         $operation_model = model(OperationModel::class);
         $vote_model = model(OperationVoteModel::class);
+        $panel_user_model = model(PanelUserModel::class);
 
         $members = $points_model->get_active_members_by_troop($points_model->get_active_members_with_points());
+
+        $member_ids = [];
+        foreach ($members as $troop) {
+            foreach ($troop['members'] as $member) {
+                $member_ids[] = (int) $member->user_id;
+            }
+        }
+        $platforms_by_member = $panel_user_model->get_by_user_ids($member_ids);
+
+        // Badges "Métiers" (2 lettres, colorés par métier) et plateforme de
+        // jeu (icône), affichés dans le tableau des membres de chaque troop.
+        foreach ($members as $troop) {
+            foreach ($troop['members'] as $member) {
+                $member->metier_badges = MetierModel::badges_for_groups($member->secondary_group_ids);
+                $member->platform = $platforms_by_member[(int) $member->user_id]->platform ?? null;
+                $member->platform_icon = $member->platform !== null ? (PanelUserModel::PLATFORM_ICONS[$member->platform] ?? null) : null;
+            }
+        }
+
         $last_operation = $operation_model->get_last_operation();
         $next_operation = $operation_model->get_next_operation();
 
@@ -99,6 +121,9 @@ class Home extends BaseController
         $history_page = min($history_page, $history_page_count - 1);
         $points_history = $points_model->get_history($user['user_id'], $history_page);
 
+        $panel_user_model = model(PanelUserModel::class);
+        $panel_user = $panel_user_model->get_by_user_id($user['user_id']);
+
         return view('generic/head')
             . view('generic/header')
             . view('profil', [
@@ -109,9 +134,35 @@ class Home extends BaseController
                 'history_page' => $history_page,
                 'history_page_count' => $history_page_count,
                 'profil_base_url' => $is_own_profile ? '/profil' : '/profil/' . $user['user_id'],
+                'panel_user' => $panel_user,
+                'platform_icon' => $panel_user !== null ? (PanelUserModel::PLATFORM_ICONS[$panel_user->platform] ?? null) : null,
+                'platforms' => PanelUserModel::PLATFORMS,
+                'info_errors' => session()->getFlashdata('info_errors') ?? [],
             ])
             . view('generic/footer')
             . view('generic/foot');
+    }
+
+    /**
+     * Modifie le pseudo in-game et la plateforme de jeu du membre connecté
+     * (modale "Modifier mes informations" de son propre profil).
+     */
+    public function update_info()
+    {
+        $rules = [
+            'platform_username' => 'required|max_length[32]',
+            'platform' => 'required|in_list[' . implode(',', PanelUserModel::PLATFORMS) . ']',
+        ];
+
+        if (!$this->validate($rules)) {
+            session()->setFlashdata('info_errors', $this->validator->getErrors());
+            return redirect()->to('/profil');
+        }
+
+        $user = session('user');
+        model(PanelUserModel::class)->upsert($user['user_id'], trim($_POST['platform_username']), $_POST['platform']);
+
+        return redirect()->to('/profil');
     }
 
     public function correct_point()

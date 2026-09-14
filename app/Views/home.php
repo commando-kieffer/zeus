@@ -57,15 +57,31 @@
                       <th>Grade</th>
                       <th>Points</th>
                       <th>Présences</th>
-                      <th>Absences</th>
+                      <th>Plateforme</th>
+                      <th>Métiers</th>
                   </tr>
                   <?php foreach($troop['members'] as $member) { ?>
                   <tr class="member" onclick="window.location.href = '/profil/<?php echo $member->user_id ?>'">
                       <td><?php echo $member->username ?></td>
                       <td><img src="/pictures/jackets/<?php echo $member->user_group_id ?>.png" alt=""></td>
                       <td><?php echo $member->panel_pts ?></td>
-                      <td><?php echo $member->panel_prs ?></td>
-                      <td><?php echo $member->panel_abs ?></td>
+                      <td><?php echo $member->panel_prs ?>/<?php echo $member->panel_abs ?></td>
+                      <td>
+                          <?php if ($member->platform_icon !== null) { ?>
+                          <img class="platform-icon" src="/pictures/icons/<?php echo esc($member->platform_icon, 'attr') ?>" alt="<?php echo esc($member->platform) ?>" title="<?php echo esc($member->platform) ?>">
+                          <?php } else { ?>
+                          <span class="platform-unknown">-</span>
+                          <?php } ?>
+                      </td>
+                      <td>
+                          <?php if (!empty($member->metier_badges)) { ?>
+                          <div class="metier-badges">
+                              <?php foreach ($member->metier_badges as $badge) { ?>
+                              <span class="metier-badge<?php echo $badge['chief'] ? ' metier-badge-chief' : '' ?>" style="--metier-color: <?php echo esc($badge['color'], 'attr') ?>" title="<?php echo esc($badge['title']) ?>"><?php echo esc($badge['abbr']) ?></span>
+                              <?php } ?>
+                          </div>
+                          <?php } ?>
+                      </td>
                   </tr>
                   <?php } ?>
               </table>

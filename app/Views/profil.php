@@ -10,6 +10,9 @@
                 <div class="badge badgespe"><?php echo $profil['troop_bordee_spe']['spe']['spe_title']->title ?></div>
 
             </div>
+            <?php if ($is_own_profile) { ?>
+            <button type="button" class="outline-btn-inverse profil-edit-trigger" data-target="edit-info-modal">Modifier mes informations</button>
+            <?php } ?>
         </div>
     </div>
     <div class="profil-stats">
@@ -32,6 +35,17 @@
         <div class="ps-data">
             <h3>Date d'entrée</h3>
             <p><?php echo $profil['joined_at'] !== null ? (new DateTime($profil['joined_at']))->format('d/m/Y') : 'Inconnue' ?></p>
+        </div>
+        <div class="ps-data">
+            <h3>Plateforme</h3>
+            <p class="ps-platform">
+                <?php if ($panel_user !== null) { ?>
+                <img src="/pictures/icons/<?php echo esc($platform_icon, 'attr') ?>" alt="<?php echo esc($panel_user->platform) ?>">
+                <?php echo esc($panel_user->platform) ?>
+                <?php } else { ?>
+                Inconnue
+                <?php } ?>
+            </p>
         </div>
     </div>
     <div class="profil-metier">
@@ -105,4 +119,61 @@
         </div>
     </div>
 </main>
+
+<?php if ($is_own_profile) { ?>
+<div class="info-modal" id="edit-info-modal">
+    <div class="info-modal-content">
+        <h2>Modifier mes informations</h2>
+        <?php if (!empty($info_errors)) { ?>
+        <ul class="form-errors">
+            <?php foreach ($info_errors as $error) { ?><li><?php echo esc($error) ?></li><?php } ?>
+        </ul>
+        <?php } ?>
+        <form action="/profil/update_info" method="post">
+            <label class="info-field">
+                <span>Pseudo in-game</span>
+                <input type="text" name="platform_username" maxlength="32" required value="<?php echo esc($panel_user->platform_username ?? '') ?>">
+            </label>
+            <label class="info-field">
+                <span>Plateforme</span>
+                <select name="platform" required>
+                    <?php foreach ($platforms as $platform) { ?>
+                    <option value="<?php echo esc($platform) ?>" <?php echo ($panel_user->platform ?? 'PC') === $platform ? 'selected' : '' ?>><?php echo esc($platform) ?></option>
+                    <?php } ?>
+                </select>
+            </label>
+            <div class="info-modal-actions">
+                <button type="button" class="outline-btn-inverse info-modal-cancel">Annuler</button>
+                <button type="submit" class="solid-btn">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.profil-edit-trigger').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var modal = document.getElementById(btn.dataset.target);
+            if (modal) modal.style.display = 'flex';
+        });
+    });
+
+    document.querySelectorAll('.info-modal-cancel').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var modal = btn.closest('.info-modal');
+            if (modal) modal.style.display = 'none';
+        });
+    });
+
+    document.querySelectorAll('.info-modal').forEach(function(modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    });
+
+    <?php if (!empty($info_errors)) { ?>
+    document.getElementById('edit-info-modal').style.display = 'flex';
+    <?php } ?>
+</script>
+<?php } ?>
 

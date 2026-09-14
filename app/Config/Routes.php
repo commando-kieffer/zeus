@@ -46,4 +46,5 @@ $routes->post('/operations/(:num)/update_report', 'Operation::update_report/$1')
 $routes->post('/operations/(:num)/vote', 'Operation::submit_vote/$1');
 $routes->post('/upload/galerie', 'Upload::store_gallery');
 $routes->post('/medals/toggle', 'Medal::toggle');
+$routes->post('/profil/update_info', 'Home::update_info');
 

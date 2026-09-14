@@ -145,6 +145,7 @@ class Operation extends BaseController
 
         $report_map = $operation_model->get_operation_report($operation_id);        // member_id => statut
         $report_troop_map = $operation_model->get_report_troop_map($operation_id);  // member_id => troop_id figée
+        $report_rank_map = $operation_model->get_report_rank_map($operation_id);    // member_id => grade figé
 
         $active_members = $points_model->get_active_members();
         $active_by_troop = $points_model->get_active_members_by_troop($active_members);
@@ -152,8 +153,16 @@ class Operation extends BaseController
 
         // Détails (pseudo, grade...) de tous les membres rapportés, y compris
         // ceux qui ont quitté le commando : non filtrés sur l'appartenance active.
+        // Le grade est celui figé au moment du rapport (une promotion ou
+        // rétrogradation depuis ne doit pas changer l'insigne affiché ici) ;
+        // à défaut (rapport antérieur à cette fonctionnalité), le grade actuel
+        // reste utilisé.
         $reported_details = [];
         foreach ($operation_model->get_members_by_ids(array_map('intval', array_keys($report_map))) as $detail) {
+            $frozen_rank = $report_rank_map[$detail->user_id] ?? null;
+            if ($frozen_rank !== null) {
+                $detail->user_group_id = $frozen_rank;
+            }
             $reported_details[(int) $detail->user_id] = $detail;
         }
 
@@ -383,7 +392,7 @@ class Operation extends BaseController
                 $status = 'absent';
             }
 
-            $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $status, (int) $troop['id']);
+            $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $status, (int) $troop['id'], (int) $member->user_group_id);
 
             $member->status = $status;
             $members_with_status[] = $member;
@@ -451,7 +460,7 @@ class Operation extends BaseController
                 // rapport que si un autre statut a été choisi. La troop figée
                 // du membre est alors sa troop actuelle.
                 if ($new_status !== 'absent') {
-                    $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $new_status, $current_troop_id);
+                    $operation_model->record_operation_status($member->user_id, $operation_array, $user['user_id'], $new_status, $current_troop_id, (int) $member->user_group_id);
                     $affected_troop_id = $current_troop_id;
                 }
             } elseif ($new_status !== $old_status) {
@@ -492,9 +501,17 @@ class Operation extends BaseController
         if (!empty($affected_troop_ids)) {
             $updated_report = $operation_model->get_operation_report($operation_id);
             $updated_troop_map = $operation_model->get_report_troop_map($operation_id);
+            $updated_rank_map = $operation_model->get_report_rank_map($operation_id);
 
             $reported_details = [];
             foreach ($operation_model->get_members_by_ids(array_map('intval', array_keys($updated_report))) as $detail) {
+                // Grade figé au moment du rapport : le message forum republié
+                // ne doit pas refléter une promotion/rétrogradation survenue
+                // depuis (voir Operation::show()).
+                $frozen_rank = $updated_rank_map[$detail->user_id] ?? null;
+                if ($frozen_rank !== null) {
+                    $detail->user_group_id = $frozen_rank;
+                }
                 $reported_details[(int) $detail->user_id] = $detail;
             }
 
