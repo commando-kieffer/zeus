@@ -754,28 +754,43 @@
 
         const button = row.querySelector('.vault-reveal');
         let remaining = REVEAL_SECONDS;
+
+        // Le bouton change de rôle : il masque désormais au lieu d'afficher.
+        // Ce marqueur est lu par l'unique gestionnaire de clic, plus bas.
+        button.dataset.revealed = '1';
         button.textContent = 'Masquer (' + remaining + ')';
 
         countdownTimer = window.setInterval(function () {
             remaining -= 1;
             button.textContent = 'Masquer (' + remaining + ')';
             if (remaining <= 0) {
-                window.clearInterval(countdownTimer);
-                window.location.reload();
+                hideAndReload();
             }
         }, 1000);
+    }
 
-        // Le rechargement détruit tout le tas JavaScript du document, ce qui
-        // est le mieux qu'on puisse faire : une chaîne JavaScript est
-        // immuable et ne peut pas être effacée sur place.
-        button.onclick = function () {
-            window.clearInterval(countdownTimer);
-            window.location.reload();
-        };
+    /**
+     * Le rechargement détruit tout le tas JavaScript du document, ce qui est le
+     * mieux qu'on puisse faire : une chaîne JavaScript est immuable et ne peut
+     * pas être effacée sur place.
+     */
+    function hideAndReload() {
+        window.clearInterval(countdownTimer);
+        window.location.reload();
     }
 
     document.querySelectorAll('.vault-reveal').forEach(function (button) {
+        // Un SEUL gestionnaire pour les deux rôles du bouton. En ajouter un
+        // second à l'affichage ne remplacerait pas celui-ci : les deux se
+        // déclencheraient, et la fenêtre modale s'ouvrirait brièvement avant
+        // le rechargement.
         button.addEventListener('click', function () {
+            if (button.dataset.revealed === '1') {
+                hideAndReload();
+
+                return;
+            }
+
             pendingEntryId = button.getAttribute('data-entry-id');
             const row = button.closest('tr');
             document.getElementById('unlock-entry-name').textContent = row.querySelector('.vault-name').textContent;
