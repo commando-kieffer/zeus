@@ -6,13 +6,20 @@
             </div>
             <form action="/login" method="post" class="right-form">
                 <img src="/pictures/zeus.png" alt="Logotype du Commando Kieffer 2004" class="zeus">
+                <?php if (($error ?? '') !== '') { ?>
+                <p class="login-error" role="alert"><?php echo esc($error) ?></p>
+                <?php } ?>
                 <div class="input nickname-input">
                     <label for="nickname">Nom de commando</label>
-                    <input type="text" name="nickname" placeholder="Votre nom de commando (ex. : Le Floch)">
+                    <input type="text" name="nickname" id="nickname"
+                           value="<?php echo esc($nickname ?? '') ?>"
+                           placeholder="Votre nom de commando (ex. : Le Floch)">
                 </div>
                 <div class="input password-input">
                     <label for="password">Mot de passe</label>
-                    <input type="password" name="password" placeholder="Votre mot de passe">
+                    <input type="password" name="password" id="password"
+                           placeholder="Votre mot de passe"
+                           <?php echo ($error ?? '') !== '' ? 'autofocus' : '' ?>>
                 </div>
                 <button type="submit" class="outline-btn">SE CONNECTER</button>
             </form>

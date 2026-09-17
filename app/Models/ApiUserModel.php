@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
-use CodeIgniter\HTTP\Exceptions\RedirectException;
-
 use CodeIgniter\Model;
 
 class ApiUserModel extends Model {
+
+    /** Identifiants refusés par le forum. */
+    public const FAILED_CREDENTIALS = 'credentials';
+
+    /** Forum injoignable : panne réseau, API hors service. */
+    public const FAILED_UNAVAILABLE = 'unavailable';
 
     public function __construct()
     {
@@ -14,7 +18,15 @@ class ApiUserModel extends Model {
         $this->table = "-";
     }
 
-    public function api_login($nickname, $password)
+    /**
+     * Authentifie un membre auprès du forum et ouvre sa session.
+     *
+     * Renvoie null en cas de succès, sinon l'une des constantes FAILED_*.
+     * L'échec n'est volontairement pas une exception : un mot de passe erroné
+     * est un déroulement normal, pas une anomalie du programme, et c'est au
+     * contrôleur de décider quoi afficher.
+     */
+    public function api_login($nickname, $password): ?string
     {
         $curl = curl_init();
 
@@ -31,27 +43,34 @@ class ApiUserModel extends Model {
                 'XF-Api-Key: ' . env("XEN_API_KEY"),
             ),
         ));
-        
+
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        
+
         $response = curl_exec($curl);
-        
-        if (curl_error($curl)) {
-            // var_dump(curl_error($curl));
-            die("Une erreur cURL est survenue.");
-        }
-        
+        $curl_error = curl_error($curl);
+
         curl_close($curl);
-        
+
+        if ($curl_error !== '') {
+            log_message('error', 'Connexion : appel au forum impossible — ' . $curl_error);
+
+            return self::FAILED_UNAVAILABLE;
+        }
+
         $data = json_decode($response, true);
 
-        $session = session();
-        
-        if ($data["success"]) {
-            $session->set('user', $data["user"]);
-            $session->set('is_logged_in', true);
-        } else {
-            throw new RedirectException('');
+        // Quand les identifiants sont refusés, le forum ne renvoie PAS de clé
+        // "success" : il renvoie une structure d'erreur. Lire cette clé sans
+        // précaution provoquait une erreur fatale, et donc la page vide
+        // constatée à la place du formulaire.
+        if (!is_array($data) || empty($data['success']) || empty($data['user'])) {
+            return self::FAILED_CREDENTIALS;
         }
+
+        $session = session();
+        $session->set('user', $data['user']);
+        $session->set('is_logged_in', true);
+
+        return null;
     }
 }

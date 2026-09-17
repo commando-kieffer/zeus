@@ -8,20 +8,49 @@ class Login extends BaseController
 {
     public function index(): string
     {
-		return view('generic/head')
-            .view('connection')
-            .view('generic/foot');
+        return $this->render();
+    }
+
+    /**
+     * Affiche le formulaire de connexion.
+     *
+     * Le nom saisi est réaffiché après un échec : le membre n'a que son mot de
+     * passe à retaper. Le champ de mot de passe reste vide, il n'est jamais
+     * renvoyé au navigateur.
+     */
+    private function render(string $error = '', string $nickname = ''): string
+    {
+        return view('generic/head')
+            . view('connection', ['error' => $error, 'nickname' => $nickname])
+            . view('generic/foot');
     }
 
     public function api_login()
-	{
-        $api_user_model = model(ApiUserModel::class);
-        $api_user_model->api_login($_POST['nickname'], $_POST['password']);
+    {
+        $nickname = trim((string) ($_POST['nickname'] ?? ''));
+        $password = (string) ($_POST['password'] ?? '');
+
+        if ($nickname === '' || $password === '') {
+            return $this->render('Identifiants incorrects', $nickname);
+        }
+
+        $failure = model(ApiUserModel::class)->api_login($nickname, $password);
+
+        if ($failure !== null) {
+            // Un forum injoignable n'est pas une faute du membre : le lui dire
+            // évite de le laisser retaper indéfiniment un mot de passe correct.
+            $message = $failure === ApiUserModel::FAILED_UNAVAILABLE
+                ? "Le forum est momentanément injoignable. Réessayez dans un instant."
+                : 'Identifiants incorrects';
+
+            return $this->render($message, $nickname);
+        }
 
         $route = session('after_login_url') ?? '';
         session()->remove('after_login_url');
+
         return redirect()->to($route);
-	}
+    }
 
     public function logout()
     {
