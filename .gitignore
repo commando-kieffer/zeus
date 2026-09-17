@@ -2,6 +2,11 @@
 
 app/Config/Database.php
 
+# Clé de chiffrement du coffre-fort : ne doit JAMAIS être versionnée.
+# Sa divulgation, combinée à une copie de la base commandokieffer_vault,
+# permet de déchiffrer la couche serveur de toutes les entrées.
+.vault_key
+
 
 #-------------------------
 # Operating Specific Junk Files

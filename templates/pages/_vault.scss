@@ -1,0 +1,275 @@
+.vault {
+    min-height: 85vh;
+
+    .vault-head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 5rem 0 3rem;
+
+        h1 {
+            font-family: 'MarianneBold';
+            font-size: 54px;
+            background-size: 100%;
+            background-repeat: repeat;
+            color: transparent;
+            background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+            background-clip: text;
+            -webkit-background-clip: text;
+
+            @include bkp(sm) {
+                font-size: 38px;
+            }
+        }
+    }
+
+    .vault-alert {
+        width: 95vw;
+        max-width: 900px;
+        margin: 0 auto 2rem;
+        padding: 1rem 1.25rem;
+        box-sizing: border-box;
+        border-radius: $radius-md;
+        background-color: rgba(97, 189, 109, 0.18);
+        font-family: 'MarianneThin';
+        font-size: 15px;
+        text-align: center;
+    }
+
+    .vault-alert-error {
+        background-color: rgba(209, 72, 65, 0.18);
+    }
+
+    .empty-state {
+        font-family: 'MarianneThin';
+        font-size: 16px;
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .vault-panel {
+        width: 95vw;
+        max-width: 900px;
+        margin: 0 auto 2.5rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        border-radius: $radius-lg;
+        box-shadow: $shadow-card;
+        padding: 1.75rem;
+        box-sizing: border-box;
+        transition: box-shadow $transition-base;
+
+        &:hover {
+            box-shadow: $shadow-card-hover;
+        }
+
+        h2 {
+            font-family: 'MarianneBold';
+            font-size: 1.3rem;
+            padding-bottom: 1rem;
+        }
+
+        p {
+            font-family: 'MarianneThin';
+            font-size: 15px;
+            line-height: 1.6;
+            padding-bottom: 0.75rem;
+        }
+    }
+
+    .vault-warning {
+        color: #a33;
+    }
+
+    // --- Tableau des entrées ---
+
+    .vault-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th {
+            font-family: 'MarianneBold';
+            font-size: 14px;
+            text-align: left;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid rgba(15, 14, 51, 0.15);
+        }
+
+        td {
+            font-family: 'MarianneThin';
+            font-size: 15px;
+            padding: 0.85rem 0.5rem;
+            border-bottom: 1px solid rgba(15, 14, 51, 0.07);
+            vertical-align: middle;
+        }
+
+        .vault-name {
+            font-family: 'MarianneBold';
+        }
+
+        .vault-date {
+            white-space: nowrap;
+        }
+
+        .vault-action {
+            text-align: right;
+            white-space: nowrap;
+        }
+    }
+
+    // Valeur factice affichée tant que l'entrée n'a pas été déchiffrée. Le
+    // flou décourage la lecture accidentelle et signale visuellement que ce
+    // n'est pas une donnée réelle.
+    .vault-secret {
+        font-family: monospace;
+        letter-spacing: 0.06em;
+        color: rgba(15, 14, 51, 0.55);
+        filter: blur(3px);
+        user-select: none;
+        transition: filter $transition-base;
+    }
+
+    .vault-secret-clear {
+        filter: none;
+        user-select: all;
+        color: $ink;
+        font-weight: bold;
+    }
+
+    .vault-locked {
+        font-family: 'MarianneThin';
+        font-size: 13px;
+        color: rgba(15, 14, 51, 0.45);
+        font-style: italic;
+    }
+
+    // --- Champs ---
+
+    .vault-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        padding-bottom: 1rem;
+
+        label,
+        .vault-field-label {
+            font-family: 'SpectralLight';
+            font-size: 13px;
+        }
+
+        input[type='text'],
+        input[type='password'] {
+            padding: 0.6rem 0.75rem;
+            border: 1px solid rgba(15, 14, 51, 0.25);
+            border-radius: $radius-sm;
+            font-family: 'MarianneThin';
+            font-size: 15px;
+        }
+    }
+
+    .vault-recipients {
+        list-style: none;
+        margin: 0.35rem 0 0;
+        padding: 0;
+        max-height: 220px;
+        overflow-y: auto;
+
+        li {
+            padding: 0.2rem 0;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'MarianneThin';
+            font-size: 15px;
+            cursor: pointer;
+        }
+    }
+
+    .vault-mandatory {
+        font-family: 'SpectralLight';
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0.1rem 0.45rem;
+        border-radius: $radius-pill;
+        background-color: rgba(15, 14, 51, 0.12);
+    }
+
+    .vault-hint {
+        font-family: 'MarianneThin';
+        font-size: 12px;
+        color: rgba(15, 14, 51, 0.6);
+        padding-top: 0.5rem;
+    }
+
+    .vault-error {
+        font-family: 'MarianneThin';
+        font-size: 14px;
+        color: #c0392b;
+        padding-top: 0.25rem;
+    }
+
+    .vault-progress {
+        font-family: 'MarianneThin';
+        font-size: 14px;
+        color: rgba(15, 14, 51, 0.65);
+        padding-top: 0.25rem;
+    }
+
+    // --- Fenêtres modales ---
+
+    .vault-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(15, 14, 51, 0.55);
+        padding: 1rem;
+        box-sizing: border-box;
+
+        // `display: flex` ci-dessus l'emporte sur la règle `[hidden]` de la
+        // feuille de style du navigateur : sans cette exception, les fenêtres
+        // modales s'afficheraient toutes au chargement de la page, malgré leur
+        // attribut hidden.
+        &[hidden] {
+            display: none;
+        }
+
+        .vault-modal-content {
+            width: 100%;
+            max-width: 460px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: $radius-lg;
+            box-shadow: $shadow-float;
+            padding: 1.75rem;
+            box-sizing: border-box;
+
+            h2 {
+                font-family: 'MarianneBold';
+                font-size: 1.2rem;
+                padding-bottom: 0.75rem;
+            }
+
+            p {
+                font-family: 'MarianneThin';
+                font-size: 14px;
+                padding-bottom: 0.75rem;
+            }
+        }
+
+        .vault-modal-actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding-top: 0.75rem;
+        }
+    }
+}

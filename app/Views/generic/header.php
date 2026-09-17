@@ -36,6 +36,7 @@
             <?php if (is_team_leader($current_user)) { ?>
                 <li><a href="/medals">Décorations</a></li>
                 <li><a href="/statistiques">Statistiques</a></li>
+                <li><a href="/coffre">Coffre</a></li>
                 <li>
                     <p id="upload-menu">Upload</p>
                 </li>

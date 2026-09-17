@@ -34,6 +34,7 @@ $routes->get('/upload/galerie', 'Upload::gallery');
 $routes->get('/medals', 'Medal::index');
 $routes->get('/classements', 'Ranking::index');
 $routes->get('/statistiques', 'Statistics::index');
+$routes->get('/coffre', 'Vault::index');
 
 $routes->post('/login', 'Login::api_login');
 $routes->post('/points/add_correct_point', 'Training::add_correct_point');
@@ -48,4 +49,10 @@ $routes->post('/operations/(:num)/vote', 'Operation::submit_vote/$1');
 $routes->post('/upload/galerie', 'Upload::store_gallery');
 $routes->post('/medals/toggle', 'Medal::toggle');
 $routes->post('/profil/update_info', 'Home::update_info');
+$routes->post('/coffre/enrol', 'Vault::enrol');
+$routes->post('/coffre/create', 'Vault::create');
+$routes->post('/coffre/decrypt', 'Vault::decrypt');
+$routes->post('/coffre/update', 'Vault::update');
+$routes->post('/coffre/report_failure', 'Vault::report_failure');
+$routes->post('/coffre/report_success', 'Vault::report_success');
 

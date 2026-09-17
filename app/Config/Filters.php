@@ -103,5 +103,11 @@ class Filters extends BaseFilters
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+    public array $filters = [
+        // Le coffre-fort est la seule partie du panel protégée contre le CSRF.
+        // Le filtre n'est pas activé globalement pour ne pas avoir à reprendre
+        // d'un coup tous les formulaires existants, mais ces routes-ci
+        // déclenchent des écritures sensibles et doivent l'être.
+        'csrf' => ['before' => ['coffre', 'coffre/*']],
+    ];
 }
