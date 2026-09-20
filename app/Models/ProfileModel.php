@@ -161,7 +161,11 @@ class ProfileModel extends Model
     }
 
     public function extract_metier($secondary_group_ids) {
-        $spe_ref_id = [21, 22, 23, 37, 44, 49, 55, 56, 57, 58, 59, 60, 61, 62, 64, 66, 67, 68, 69, 70, 71, 72, 73, 76, 77, 78, 79, 80];
+        // Liste dérivée de MetierModel, et non recopiée : la même énumération
+        // vivait jusqu'ici en trois exemplaires, si bien que retirer un métier
+        // demandait trois modifications — et qu'en oublier une laissait la
+        // page de profil afficher un métier que le reste du panel ignorait.
+        $spe_ref_id = array_keys(MetierModel::METIERS);
         $metier_list = [];
 
         foreach ($secondary_group_ids as $group_id) {

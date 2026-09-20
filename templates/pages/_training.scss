@@ -85,3 +85,58 @@
         }
     }
 }
+// Attribution des points de métier : choix du métier, puis validation de la
+// liste de ses membres.
+.training {
+    .job-picker {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 1rem;
+        padding-bottom: 2rem;
+
+        label {
+            width: 100%;
+            text-align: center;
+            font-family: 'SpectralLight';
+            font-size: 13px;
+            padding-bottom: 0.35rem;
+        }
+
+        select {
+            min-width: 16rem;
+            padding: 0.55rem 0.75rem;
+            border: 1px solid rgba(15, 14, 51, 0.25);
+            border-radius: $radius-sm;
+            font-family: 'MarianneThin';
+            font-size: 15px;
+            background-color: #fff;
+        }
+
+        @include bkp(sm) {
+            select {
+                min-width: 0;
+                width: 100%;
+            }
+        }
+    }
+
+    .job-empty {
+        font-family: 'MarianneThin';
+        font-size: 16px;
+        text-align: center;
+        padding: 1rem 1rem 3rem;
+    }
+
+    .job-summary {
+        font-family: 'MarianneThin';
+        font-size: 14px;
+        line-height: 1.55;
+        padding-bottom: 1rem;
+
+        strong {
+            font-family: 'MarianneBold';
+        }
+    }
+}

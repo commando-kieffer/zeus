@@ -61,14 +61,36 @@ class Medal extends BaseController
             }
         }
 
+        $all_medals = $medal_model->get_all_medals();
+        $medals_by_member = $medal_model->get_medal_ids_by_member($member_ids);
+
         return view('generic/head')
             . view('generic/header')
             . view('medals', [
                 'members_by_troop' => $members_by_troop,
-                'all_medals' => $medal_model->get_all_medals(),
-                'medals_by_member' => $medal_model->get_medal_ids_by_member($member_ids),
+                'all_medals' => $all_medals,
+                'medals_by_member' => $medals_by_member,
+                'pending_awards' => $medal_model->get_pending_awards($all_medals),
                 'default_medal_date' => $this->default_medal_date(),
             ])
+            . view('generic/footer')
+            . view('generic/foot');
+    }
+
+    /**
+     * Catalogue des décorations : visuel, nom et conditions d'obtention.
+     *
+     * Page de consultation seulement ; l'attribution se fait sur /medals.
+     */
+    public function catalogue()
+    {
+        if (!is_team_leader(session('user'))) {
+            return $this->render_message("Vous n'avez pas la permission d'accéder à cette page.");
+        }
+
+        return view('generic/head')
+            . view('generic/header')
+            . view('medal_list', ['all_medals' => model(MedalModel::class)->get_all_medals()])
             . view('generic/footer')
             . view('generic/foot');
     }

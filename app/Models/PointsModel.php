@@ -7,6 +7,8 @@ use DateTime;
 
 class PointsModel extends Model
 {
+    /** Points accordés à un membre pour son travail dans un métier. */
+    public const WORK_POINTS = 25;
 
     public function __construct()
     {
@@ -122,24 +124,31 @@ class PointsModel extends Model
         return $members;
     }
 
-    public function get_active_members_by_work($members_list)
+    /**
+     * Membres actifs exerçant un métier donné.
+     *
+     * FIND_IN_SET et non LIKE : secondary_group_ids est une liste séparée par
+     * des virgules, et un LIKE '%21%' attraperait aussi les groupes 121 ou 210.
+     */
+    public function get_members_by_job(array $job_group_ids): array
     {
-        $work_ref_id = [21, 22, 23, 37, 44, 49, 55, 56, 57, 58, 59, 60, 61, 62, 64, 66, 67, 68, 69, 70, 71, 72, 73, 76, 77, 78, 79, 80];
-        $troops_members_list = $this->get_active_members_by_troop($members_list);
-
-
-
-        foreach ($troops_members_list as $troop) {
-
-            foreach ($troop['members'] as $key => $member) {
-                $secondary_group_ids = $array = explode(",", $member->secondary_group_ids);
-                if (empty(array_intersect($secondary_group_ids, $work_ref_id))) {
-                    unset($troops_members_list[$troop['id']]['members'][$key]);
-                }
-            }
+        $job_group_ids = array_values(array_unique(array_map('intval', $job_group_ids)));
+        if ($job_group_ids === []) {
+            return [];
         }
 
-        return $troops_members_list;
+        // Un service peut couvrir plusieurs groupes (l'Ambassade réunit
+        // ambassadeurs et consuls) : un membre en fait partie s'il appartient
+        // à l'un d'eux, d'où la disjonction.
+        $conditions = implode(' OR ', array_fill(0, count($job_group_ids), 'FIND_IN_SET(?, secondary_group_ids) > 0'));
+
+        $query = "SELECT username, user_group_id, secondary_group_ids, user_id
+                  FROM xf_user
+                  WHERE (((user_group_id BETWEEN 5 AND 20) OR user_group_id IN (50, 54)))
+                    AND ($conditions)
+                  ORDER BY user_order ASC, user_group_id DESC";
+
+        return $this->db->query($query, $job_group_ids)->getResult();
     }
 
     /**
@@ -248,17 +257,25 @@ class PointsModel extends Model
         ]);
     }
 
-    public function set_work($member_id)
+    /**
+     * Récompense le travail d'un membre dans un métier.
+     *
+     * L'intitulé du métier est conservé dans l'historique : sans lui, un
+     * membre exerçant plusieurs métiers ne pourrait pas savoir lequel a été
+     * récompensé, et une ligne « Métier +25 » n'apprendrait rien.
+     */
+    public function set_work($member_id, ?string $job_title = null)
     {
-        $query = "UPDATE xf_user SET panel_pts = panel_pts + 25 WHERE user_id = ?";
-        $this->db->query($query, array($member_id));
+        $query = "UPDATE xf_user SET panel_pts = panel_pts + ? WHERE user_id = ?";
+        $this->db->query($query, array(self::WORK_POINTS, $member_id));
 
-        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Work->value,
-            25,
-            session("user")["user_id"]
+            self::WORK_POINTS,
+            session("user")["user_id"],
+            $job_title === null ? null : mb_substr($job_title, 0, 256)
         ]);
     }
 

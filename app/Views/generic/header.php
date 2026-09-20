@@ -28,13 +28,15 @@
                 <p id="operations-menu">Opérations</p>
             </li>
             <li><a href="/classements">Classements</a></li>
-            <?php if (session("user")['is_staff']) { ?>
+            <?php if (session("user")['is_staff'] || can_award_job_points($current_user)) { ?>
                 <li>
                     <p id="points">Points</p>
                 </li>
             <?php } ?>
             <?php if (is_team_leader($current_user)) { ?>
-                <li><a href="/medals">Décorations</a></li>
+                <li>
+                    <p id="medals-menu">Décorations</p>
+                </li>
                 <li><a href="/statistiques">Statistiques</a></li>
                 <li><a href="/coffre">Coffre</a></li>
                 <li>
@@ -54,17 +56,27 @@
             <?php } ?>
         </ul>
     </nav>
-    <?php if (session("user")['is_staff']) { ?>
+    <?php if (session("user")['is_staff'] || can_award_job_points($current_user)) { ?>
     <nav class="sub sub-points">
         <ul>
+            <?php if (can_award_job_points($current_user)) { ?>
             <li><a href="/points/work">Points pour métier</a></li>
+            <?php } ?>
+            <?php if (session("user")['is_staff']) { ?>
             <li><a href="/points/blame">Blâme</a></li>
             <li><a href="/points/warning">Avertissement</a></li>
             <li><a href="/points/correct_point">Correction de points</a></li>
+            <?php } ?>
         </ul>
     </nav>
     <?php } ?>
     <?php if (is_team_leader($current_user)) { ?>
+    <nav class="sub sub-medals">
+        <ul>
+            <li><a href="/medals/liste">Liste</a></li>
+            <li><a href="/medals">Attribution</a></li>
+        </ul>
+    </nav>
     <nav class="sub sub-upload">
         <ul>
             <li><a href="/upload/galerie">Upload galerie</a></li>
@@ -93,5 +105,6 @@
 
     toggleSubMenu("operations-menu", ".sub-operations");
     toggleSubMenu("points", ".sub-points");
+    toggleSubMenu("medals-menu", ".sub-medals");
     toggleSubMenu("upload-menu", ".sub-upload");
 </script>

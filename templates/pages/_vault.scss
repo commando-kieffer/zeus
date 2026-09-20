@@ -59,6 +59,15 @@
         box-sizing: border-box;
         transition: box-shadow $transition-base;
 
+        // Sur mobile, une largeur en vw ne laisse plus de marge dès que la
+        // barre de défilement verticale apparaît : la fiche semble alors
+        // collée au bord. Une marge explicite garantit la gouttière.
+        @include bkp(md) {
+            width: auto;
+            margin: 0 1rem 2rem;
+            padding: 1.25rem 1rem;
+        }
+
         &:hover {
             box-shadow: $shadow-card-hover;
         }
@@ -114,6 +123,84 @@
         .vault-action {
             text-align: right;
             white-space: nowrap;
+        }
+
+        // Sur mobile, quatre colonnes dont deux boutons ne tiennent pas dans
+        // la largeur : le tableau est reconstruit en fiches empilees. Les
+        // en-tetes sont masques et remplaces, cellule par cellule, par le
+        // libelle porte en attribut data-label.
+        @include bkp(md) {
+            display: block;
+
+            thead {
+                display: none;
+            }
+
+            tbody,
+            tr,
+            td {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            tr {
+                border: 1px solid rgba(15, 14, 51, 0.12);
+                border-radius: $radius-md;
+                padding: 0.75rem 1rem;
+                margin-bottom: 0.85rem;
+                background-color: rgba(255, 255, 255, 0.55);
+            }
+
+            td {
+                border-bottom: 0;
+                padding: 0.3rem 0;
+                display: flex;
+                flex-direction: row;
+                align-items: baseline;
+                gap: 0.75rem;
+
+                &::before {
+                    content: attr(data-label);
+                    font-family: 'SpectralLight';
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    color: rgba(15, 14, 51, 0.55);
+                    flex: 0 0 5.5rem;
+                }
+
+                &:empty {
+                    display: none;
+                }
+            }
+
+            .vault-secret {
+                // Un mot de passe long ne doit pas elargir la fiche.
+                min-width: 0;
+                overflow-wrap: anywhere;
+                word-break: break-all;
+            }
+
+            .vault-action {
+                text-align: left;
+                white-space: normal;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                padding-top: 0.6rem;
+
+                &::before {
+                    flex-basis: 100%;
+                }
+
+                // Les boutons du coffre portent un rembourrage large : côte à
+                // côte, ils débordent de la fiche sur un écran étroit. Ils
+                // occupent donc chacun toute la largeur.
+                button {
+                    flex: 1 1 100%;
+                    min-width: 0;
+                }
+            }
         }
     }
 

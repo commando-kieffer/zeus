@@ -58,10 +58,10 @@
             <tbody>
                 <?php foreach ($entries as $entry) { ?>
                 <tr data-entry-id="<?php echo esc($entry->id) ?>">
-                    <td class="vault-name"><?php echo esc($entry->name) ?></td>
-                    <td class="vault-secret" data-role="secret"><span class="vault-placeholder"></span></td>
-                    <td class="vault-date"><?php echo esc(date('d/m/Y', strtotime($entry->creation_date))) ?></td>
-                    <td class="vault-action">
+                    <td class="vault-name" data-label="Nom"><?php echo esc($entry->name) ?></td>
+                    <td class="vault-secret" data-role="secret" data-label="Mot de passe"><span class="vault-placeholder"></span></td>
+                    <td class="vault-date" data-label="Créée le"><?php echo esc(date('d/m/Y', strtotime($entry->creation_date))) ?></td>
+                    <td class="vault-action" data-label="Actions">
                         <?php if ($entry->authorized) { ?>
                         <button type="button" class="outline-btn-inverse vault-reveal" data-entry-id="<?php echo esc($entry->id) ?>">Afficher</button>
                         <?php } else { ?>

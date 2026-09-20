@@ -5,6 +5,7 @@ namespace App\Controllers;
 use CodeIgniter\HTTP\Exceptions\RedirectException;
 
 use \App\Models\PointsModel;
+use \App\Models\MetierModel;
 
 class Training extends BaseController
 {
@@ -68,15 +69,39 @@ class Training extends BaseController
         return redirect('operation_success');
     }
 
+    /**
+     * Attribue les points de métier.
+     *
+     * Les droits sont recalculés ici à partir de la session, jamais déduits de
+     * la requête : le métier soumis doit figurer parmi ceux que l'auteur peut
+     * récompenser, et chaque membre coché doit réellement exercer ce métier.
+     * Sans ce second contrôle, un identifiant ajouté à la main dans le
+     * formulaire suffirait à récompenser n'importe qui.
+     */
     public function add_work()
     {
+        helper('job_points');
+
+        $user = session('user');
+        $jobs = awardable_jobs($user);
+        $job = (int) ($_POST['job'] ?? 0);
+
+        if (!isset($jobs[$job])) {
+            return view('generic/head')
+                . view('generic/header')
+                . view('404', ['message' => "Vous n'avez pas la permission de récompenser ce métier."])
+                . view('generic/footer')
+                . view('generic/foot');
+        }
+
         $points_model = model(PointsModel::class);
 
-        $active_members = $points_model->get_active_members();
+        $job_title = $jobs[$job];
 
-        foreach($active_members as $member) {
-            if (isset($_POST[$member->user_id]))
-                $points_model->set_work($member->user_id);
+        foreach ($points_model->get_members_by_job(MetierModel::job_group_ids($job)) as $member) {
+            if (isset($_POST[$member->user_id])) {
+                $points_model->set_work($member->user_id, $job_title);
+            }
         }
 
         return redirect('operation_success');

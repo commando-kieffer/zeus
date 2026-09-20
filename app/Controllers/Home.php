@@ -23,6 +23,7 @@ class Home extends BaseController
         }
 
         helper('date');
+        helper('job_points');
     }
 
     public function index(): string
@@ -204,15 +205,46 @@ class Home extends BaseController
             . view('generic/foot');
     }
 
+    /**
+     * Attribution des points de métier.
+     *
+     * La page se parcourt en deux temps : on choisit d'abord le métier à
+     * récompenser, puis on valide la liste de ses membres. Un chef de service
+     * ne se voit proposer que le ou les métiers qu'il dirige ; l'état-major et
+     * le staff les voient tous.
+     */
     public function work()
     {
-        $points_model = model(PointsModel::class);
+        $user = session('user');
+        $jobs = awardable_jobs($user);
 
-        $members = $points_model->get_active_members_by_work($points_model->get_active_members());
+        if ($jobs === []) {
+            return view('generic/head')
+                . view('generic/header')
+                . view('404', ['message' => "Vous n'avez pas la permission d'accéder à cette page."])
+                . view('generic/footer')
+                . view('generic/foot');
+        }
+
+        // Un métier absent de la liste autorisée est traité comme non choisi :
+        // le paramètre vient de l'URL et ne prouve rien.
+        $selected_job = (int) ($_GET['job'] ?? 0);
+        if (!isset($jobs[$selected_job])) {
+            $selected_job = 0;
+        }
+
+        $members = $selected_job === 0
+            ? []
+            : model(PointsModel::class)->get_members_by_job(MetierModel::job_group_ids($selected_job));
 
         return view('generic/head')
             . view('generic/header')
-            . view('work', ['members' => $members])
+            . view('work', [
+                'jobs' => $jobs,
+                'selected_job' => $selected_job,
+                'members' => $members,
+                'points_per_member' => PointsModel::WORK_POINTS,
+            ])
             . view('generic/footer')
             . view('generic/foot');
     }

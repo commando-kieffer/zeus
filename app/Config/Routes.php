@@ -32,6 +32,7 @@ $routes->get('/operations/report/(:num)', 'Operation::report_form/$1');
 $routes->get('/operations/(:num)', 'Operation::show/$1');
 $routes->get('/upload/galerie', 'Upload::gallery');
 $routes->get('/medals', 'Medal::index');
+$routes->get('/medals/liste', 'Medal::catalogue');
 $routes->get('/classements', 'Ranking::index');
 $routes->get('/statistiques', 'Statistics::index');
 $routes->get('/coffre', 'Vault::index');

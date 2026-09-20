@@ -26,6 +26,137 @@
         }
     }
 
+    // Suggestions d'attribution, avant les tableaux par troop.
+    .medals-pending {
+        width: 95vw;
+        max-width: 1100px;
+        margin: 0 auto 3rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        border-radius: $radius-lg;
+        box-shadow: $shadow-card;
+        padding: 1.75rem;
+        box-sizing: border-box;
+        overflow-x: auto;
+
+        @include bkp(md) {
+            padding: 1.25rem 1rem;
+        }
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-family: 'MarianneBold';
+            font-size: 1.3rem;
+            padding-bottom: 1.25rem;
+        }
+
+        .pending-count {
+            font-family: 'SpectralLight';
+            font-size: 13px;
+            padding: 0.1rem 0.6rem;
+            border-radius: $radius-pill;
+            background-color: rgba(209, 72, 65, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 640px;
+        }
+
+        th {
+            font-family: 'MarianneBold';
+            font-size: 14px;
+            text-align: left;
+            padding: 0.6rem 0.5rem;
+            border-bottom: 1px solid rgba(15, 14, 51, 0.15);
+        }
+
+        td {
+            font-family: 'MarianneThin';
+            font-size: 15px;
+            padding: 0.6rem 0.5rem;
+            border-bottom: 1px solid rgba(15, 14, 51, 0.07);
+            vertical-align: middle;
+
+            img {
+                height: 34px;
+                width: auto;
+                vertical-align: middle;
+            }
+        }
+
+        .pending-medal {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .pending-reason {
+            font-family: 'SpectralLight';
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .pending-form {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        // Le masquage est accroché à CHAQUE sélecteur plutôt que posé une fois
+        // pour toutes sur [hidden] : une règle générique aurait la même
+        // spécificité que celles qui déclarent display juste en dessous, et
+        // c'est alors l'ordre d'écriture qui trancherait — l'attribut hidden
+        // resterait sans effet, les deux boutons de confirmation s'affichant
+        // en permanence.
+        .pending-ask {
+            &[hidden] {
+                display: none;
+            }
+        }
+
+        .pending-confirm {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+
+            &[hidden] {
+                display: none;
+            }
+        }
+
+        .pending-yes,
+        .pending-no {
+            min-width: 2.6rem;
+            padding-left: 0.6rem;
+            padding-right: 0.6rem;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .pending-yes {
+            border-color: #157f3b;
+            color: #157f3b;
+
+            &:hover {
+                background-color: #157f3b;
+                color: #fff;
+            }
+        }
+
+        .pending-no {
+            border-color: #c0392b;
+            color: #c0392b;
+
+            &:hover {
+                background-color: #c0392b;
+                color: #fff;
+            }
+        }
+    }
+
     .medals-list {
         display: flex;
         flex-direction: column;
@@ -173,6 +304,110 @@
             justify-content: flex-end;
             gap: 1rem;
             padding-top: 1.5rem;
+        }
+    }
+}
+
+// Catalogue des décorations (/medals/liste) : page de consultation.
+// Le visuel prime sur le texte, d'où une vignette haute et non rognée —
+// les médailles sont des objets verticaux, les écraser les rend illisibles.
+.medal-catalogue {
+    min-height: 85vh;
+
+    .medals-head {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 5rem 0 3rem;
+
+        h1 {
+            font-family: 'MarianneBold';
+            font-size: 54px;
+            background-size: 100%;
+            background-repeat: repeat;
+            color: transparent;
+            background-image: linear-gradient( 111.4deg,  rgba(7,7,9,1) 6.5%, rgba(27,24,113,1) 93.2% );
+            background-clip: text;
+            -webkit-background-clip: text;
+
+            @include bkp(sm) {
+                font-size: 38px;
+            }
+        }
+
+        .catalogue-intro {
+            font-family: 'MarianneThin';
+            font-size: 16px;
+            text-align: center;
+            max-width: 40rem;
+            padding: 0 1rem;
+        }
+    }
+
+    .catalogue-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 1.75rem;
+        width: 95vw;
+        max-width: 1150px;
+        margin: 0 auto;
+        padding-bottom: 4rem;
+
+        @include bkp(sm) {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+    }
+
+    .catalogue-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        border-radius: $radius-lg;
+        box-shadow: $shadow-card;
+        padding: 1.5rem 1.25rem;
+        box-sizing: border-box;
+        transition: box-shadow $transition-base, transform $transition-base;
+
+        &:hover {
+            box-shadow: $shadow-card-hover;
+            transform: translateY(-3px);
+        }
+
+        h2 {
+            font-family: 'MarianneBold';
+            font-size: 1rem;
+            text-align: center;
+            line-height: 1.35;
+        }
+
+        p {
+            font-family: 'MarianneThin';
+            font-size: 13px;
+            line-height: 1.55;
+            text-align: center;
+            color: rgba(15, 14, 51, 0.75);
+        }
+    }
+
+    .catalogue-visual {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+
+        @include bkp(sm) {
+            height: 150px;
+        }
+
+        img {
+            max-height: 100%;
+            max-width: 100%;
+            width: auto;
+            object-fit: contain;
         }
     }
 }

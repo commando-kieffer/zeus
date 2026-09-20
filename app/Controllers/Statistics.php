@@ -125,6 +125,8 @@ class Statistics extends BaseController
                 'pie_troops' => $pie_troops,
                 'still_here' => $still_here,
                 'left' => $left,
+                'platforms' => $stats_model->get_platform_distribution(),
+                'platform_colors' => StatisticsModel::PLATFORM_COLORS,
             ])
             . view('generic/footer')
             . view('generic/foot');
