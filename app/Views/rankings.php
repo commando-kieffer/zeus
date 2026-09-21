@@ -14,6 +14,7 @@
         </form>
     </section>
 
+    <?php if (!empty($podium_steps)) { ?>
     <section class="podium<?php echo $is_negative ? ' podium-negative' : '' ?>">
         <?php foreach ($podium_steps as $rank => $step_members) { ?>
         <div class="podium-spot podium-place-<?php echo $rank ?>">
@@ -35,6 +36,7 @@
         </div>
         <?php } ?>
     </section>
+    <?php } ?>
 
     <section class="rankings-list">
         <div class="tfc-container">
@@ -46,6 +48,7 @@
                     <th>Points</th>
                     <th>Présences</th>
                     <th>Absences</th>
+                    <th>OPEX</th>
                     <th>Taux de présence</th>
                     <th>Médailles</th>
                     <th>Date d'adhésion</th>
@@ -58,6 +61,7 @@
                     <td><?php echo $member->panel_pts ?></td>
                     <td><?php echo $member->panel_prs ?></td>
                     <td><?php echo $member->panel_abs ?></td>
+                    <td><?php echo $member->panel_opex ?></td>
                     <td><?php echo ceil($member->presence_rate * 100) ?>%</td>
                     <td><?php echo $member->medal_count ?></td>
                     <td><?php echo $member->joined_at !== null ? (new DateTime($member->joined_at))->format('d/m/y') : '-' ?></td>

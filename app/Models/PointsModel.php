@@ -36,7 +36,7 @@ class PointsModel extends Model
     {
         $members = [];
 
-        $query = "SELECT username, user_group_id, secondary_group_ids, user_id, panel_pts, panel_prs, panel_abs FROM xf_user ORDER BY user_order ASC, user_group_id DESC";
+        $query = "SELECT username, user_group_id, secondary_group_ids, user_id, panel_pts, panel_prs, panel_abs, panel_opex FROM xf_user ORDER BY user_order ASC, user_group_id DESC";
         $result = $this->db->query($query);
 
         foreach ($result->getResult() as $member) {

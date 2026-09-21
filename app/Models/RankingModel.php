@@ -17,10 +17,46 @@ class RankingModel extends Model
         'absence_rate' => ['label' => "Taux d'absence", 'negative' => true],
         'presence' => ['label' => 'Présences', 'negative' => false],
         'absence' => ['label' => 'Absences', 'negative' => true],
+        'opex' => ['label' => 'OPEX', 'negative' => false],
         'seniority' => ['label' => 'Ancienneté', 'negative' => false],
         'juniority' => ['label' => 'Derniers arrivés', 'negative' => false],
         'medals' => ['label' => 'Nombre de médailles', 'negative' => false],
     ];
+
+    /**
+     * Ce membre mérite-t-il une place sur le podium pour ce classement ?
+     *
+     * Une valeur nulle n'est pas un résultat : n'avoir participé à aucune
+     * OPEX, n'avoir aucune médaille ou aucune présence ne distingue personne,
+     * et sur un classement négatif n'avoir aucune absence est au contraire
+     * irréprochable. Dans les deux cas la place est au tableau, pas sur une
+     * marche. Sans cette règle, les soixante-sept membres à zéro OPEX se
+     * partageaient la troisième marche et vidaient le tableau.
+     */
+    public function is_podium_worthy(string $ranking, $member): bool
+    {
+        switch ($ranking) {
+            case 'presence_rate':
+                return $member->presence_rate > 0;
+            case 'absence_rate':
+                return $member->absence_rate > 0;
+            case 'presence':
+                return $member->panel_prs > 0;
+            case 'absence':
+                return $member->panel_abs > 0;
+            case 'opex':
+                return $member->panel_opex > 0;
+            case 'medals':
+                return $member->medal_count > 0;
+            case 'seniority':
+            case 'juniority':
+                // Une date d'adhésion inconnue ne permet aucun classement.
+                return $member->joined_at !== null;
+            case 'points':
+            default:
+                return $member->panel_pts > 0;
+        }
+    }
 
     public function __construct()
     {
@@ -106,6 +142,8 @@ class RankingModel extends Model
                 return fn($a, $b) => $b->panel_prs <=> $a->panel_prs;
             case 'absence':
                 return fn($a, $b) => $b->panel_abs <=> $a->panel_abs;
+            case 'opex':
+                return fn($a, $b) => $b->panel_opex <=> $a->panel_opex;
             case 'seniority':
                 // Le plus ancien d'abord ; une date d'adhésion inconnue est
                 // toujours reléguée en fin de classement.

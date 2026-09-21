@@ -50,11 +50,18 @@ class Ranking extends BaseController
         // membres ex-aequo sont regroupés sur une seule et même marche
         // (podium_steps : rang => membres de ce rang), pas une marche
         // dupliquée par membre.
+        //
+        // Seule une valeur non nulle donne droit à une marche : c'est ce qui
+        // empêche les soixante-sept membres à zéro OPEX de se partager la
+        // troisième place en vidant le tableau. Le nombre d'ex-aequo, lui,
+        // n'est pas plafonné : huit membres à 100 % de présence méritent tous
+        // leur place, et les écarter laisserait un podium vide, ce qui serait
+        // pire que l'encombrement.
         $podium_steps = [];
         $rest = [];
         foreach ($members as $i => $member) {
             $rank = $ranks[$i];
-            if ($rank <= 3) {
+            if ($rank <= 3 && $ranking_model->is_podium_worthy($ranking, $member)) {
                 $podium_steps[$rank][] = $member;
             } else {
                 $rest[] = ['rank' => $rank, 'member' => $member];

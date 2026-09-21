@@ -16,6 +16,8 @@ if (!function_exists('format_ranking_value')) {
                 return $member->panel_prs . ' présences';
             case 'absence':
                 return $member->panel_abs . ' absences';
+            case 'opex':
+                return $member->panel_opex . ' OPEX';
             case 'seniority':
             case 'juniority':
                 return $member->joined_at !== null ? (new DateTime($member->joined_at))->format('d/m/y') : '-';

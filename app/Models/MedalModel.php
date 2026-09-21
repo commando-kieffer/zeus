@@ -24,8 +24,8 @@ class MedalModel extends Model
      *    toutes les décorations au mérite, à la conduite ou à la connaissance :
      *    leur appréciation est humaine, les suggérer automatiquement
      *    reviendrait à les dévaluer ;
-     *  - les décorations liées aux matchs et tournois : le panel ne tient
-     *    aucun compteur de participation.
+     *  - les décorations au mérite, à la conduite ou à la connaissance, dont
+     *    l'appréciation est humaine.
      */
     public const AUTO_RULES = [
         2  => ['points', 400],       // Médaille de bronze
@@ -40,6 +40,9 @@ class MedalModel extends Model
         11 => ['anciennete', 4],     // Chevalier ONM : 4 ans
         24 => ['messages', 750],     // Médaille des évadés
         25 => ['messages', 2000],    // France Libérée
+        19 => ['opex', 11],          // Croix de guerre TOE : plus de 10 matchs
+        20 => ['opex', 21],          // Médaille d'Outre Mer : plus de 20
+        29 => ['opex', 51],          // Services volontaires France libre : plus de 50
     ];
 
     /**
@@ -56,13 +59,14 @@ class MedalModel extends Model
                          u.user_group_id,
                          u.panel_pts,
                          u.panel_prs,
+                         u.panel_opex,
                          u.message_count,
                          MIN(ir.date) AS joined_at
                   FROM xf_user u
                   LEFT JOIN infos_recrutement ir ON ir.user_id = u.user_id
                   WHERE (u.user_group_id BETWEEN 5 AND 20) OR u.user_group_id IN (50, 54)
                   GROUP BY u.user_id, u.username, u.user_group_id,
-                           u.panel_pts, u.panel_prs, u.message_count
+                           u.panel_pts, u.panel_prs, u.panel_opex, u.message_count
                   ORDER BY u.username ASC";
 
         return $this->db->query($query)->getResult();
@@ -129,6 +133,10 @@ class MedalModel extends Model
                     case 'messages':
                         $value = (int) $member->message_count;
                         $reason = $value . ' messages';
+                        break;
+                    case 'opex':
+                        $value = (int) $member->panel_opex;
+                        $reason = $value . ' OPEX';
                         break;
                     case 'anciennete':
                         // Sans date de recrutement connue, l'ancienneté ne peut

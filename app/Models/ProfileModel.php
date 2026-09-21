@@ -64,7 +64,7 @@ class ProfileModel extends Model
     }
 
     public function get_profil_stats($user_id) {
-        $query = "SELECT panel_pts, panel_prs, panel_abs FROM xf_user WHERE user_id = ?";
+        $query = "SELECT panel_pts, panel_prs, panel_abs, panel_opex FROM xf_user WHERE user_id = ?";
         $result = $this->db->query($query, array($user_id));
         return $result->getResult()[0];
     }
