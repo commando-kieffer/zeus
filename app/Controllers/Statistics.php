@@ -245,6 +245,8 @@ class Statistics extends BaseController
                 'presence_buckets' => $presence_buckets,
                 'presence_rate_by_troop' => $presence_rate_by_troop,
                 'presence_rate_total' => $presence_rate_total,
+                'presence_count_by_troop' => $presence_present,
+                'presence_count_total' => $presence_present_total,
                 'has_presence' => $has_presence,
             ])
             . view('generic/footer')

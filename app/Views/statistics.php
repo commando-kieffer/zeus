@@ -70,6 +70,13 @@
         </div>
     </section>
 
+    <section class="statistics-chart-card statistics-chart-wide">
+        <h2>Présences</h2>
+        <div class="chart-holder chart-holder-line">
+            <canvas id="chart-presence-count"></canvas>
+        </div>
+    </section>
+
     <?php } ?>
 
     <!-- Hors période : il s'agit de l'effectif d'aujourd'hui, pas d'un flux
@@ -227,6 +234,46 @@
                             },
                         },
                     },
+                },
+            });
+
+            // Même période/granularité que le taux de présence, mais le
+            // nombre brut de présences au lieu du pourcentage : un bucket
+            // sans rapport y vaut légitimement 0 (contrairement au taux, une
+            // absence de rapport n'y est pas une valeur indéfinie), donc pas
+            // de spanGaps ni de trou dans la courbe ici.
+            const presenceCountByTroop = <?php echo json_encode($presence_count_by_troop) ?>;
+            const presenceCountTotal = <?php echo json_encode($presence_count_total) ?>;
+
+            const presenceCountDatasets = [];
+            for (const troopId in troops) {
+                presenceCountDatasets.push({
+                    label: troops[troopId].title,
+                    data: presenceBuckets.map(function (d) { return presenceCountByTroop[troopId][d]; }),
+                    borderColor: troops[troopId].color,
+                    backgroundColor: troops[troopId].color,
+                    tension: 0.25,
+                    pointRadius: 2,
+                });
+            }
+            presenceCountDatasets.push({
+                label: 'Total',
+                data: presenceBuckets.map(function (d) { return presenceCountTotal[d]; }),
+                borderColor: '#0F0E33',
+                backgroundColor: '#0F0E33',
+                borderDash: [6, 4],
+                tension: 0.25,
+                pointRadius: 2,
+            });
+
+            new Chart(document.getElementById('chart-presence-count'), {
+                type: 'line',
+                data: { labels: presenceLabels, datasets: presenceCountDatasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
                 },
             });
         }
