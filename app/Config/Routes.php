@@ -22,6 +22,7 @@ $routes->get('/points/select_training', 'Home::select_training');
 $routes->get('/points/modify_training', 'Home::modify_training');
 $routes->get('/points/warning', 'Home::warning');
 $routes->get('/points/blame', 'Home::blame');
+$routes->get('/points/opex', 'Home::opex');
 $routes->get('/points/work', 'Home::work');
 $routes->get('/operation_success', 'Training::operation_success');
 
@@ -40,6 +41,7 @@ $routes->get('/coffre', 'Vault::index');
 $routes->post('/login', 'Login::api_login');
 $routes->post('/points/add_correct_point', 'Training::add_correct_point');
 $routes->post('/points/add_blame', 'Training::add_blame');
+$routes->post('/points/add_opex', 'Training::add_opex');
 $routes->post('/points/add_work', 'Training::add_work');
 $routes->post('/points/add_warning', 'Training::add_warning');
 $routes->post('/points/modify_training_presence', 'Training::modify_training_presence');

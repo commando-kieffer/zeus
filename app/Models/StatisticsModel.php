@@ -59,6 +59,35 @@ class StatisticsModel extends Model
     }
 
     /**
+     * Une ligne par présence rapportée (operation_report) pour une opération
+     * dont la date tombe dans [start, end] (bornes incluses, dates au format
+     * Y-m-d). troop_id est la troop figée sur le rapport au moment où il a
+     * été rempli, pas l'appartenance actuelle du membre : un membre parti ou
+     * ayant changé de troop depuis reste compté dans la troop qu'il avait ce
+     * jour-là.
+     *
+     * @return array<int, object{op_date: string, troop_id: ?int, status: string}>
+     */
+    public function get_operation_presence(string $start, string $end): array
+    {
+        $query = "SELECT o.date AS op_date, r.troop_id, r.status
+            FROM operation_report r
+            INNER JOIN operation o ON o.id = r.operation_id
+            WHERE o.date BETWEEN ? AND ?
+            ORDER BY o.date ASC";
+
+        $result = $this->db->query($query, [$start, $end]);
+
+        $rows = [];
+        foreach ($result->getResult() as $row) {
+            $row->troop_id = $row->troop_id === null ? null : (int) $row->troop_id;
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    /**
      * Couleurs des plateformes du graphique de répartition.
      */
     public const PLATFORM_COLORS = [

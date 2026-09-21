@@ -10,6 +10,7 @@ enum PointsCategoryModel: int
     case Warning = 4;
     case Correction = 5;
     case Operation = 6;
+    case Opex = 7;
 
     public function asText()
     {
@@ -21,6 +22,7 @@ enum PointsCategoryModel: int
             case static::Warning: return "Avertissement";
             case static::Correction: return "Correction";
             case static::Operation: return "Opération";
+            case static::Opex: return "OPEX";
         }
     }
 }

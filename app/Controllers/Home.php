@@ -192,6 +192,19 @@ class Home extends BaseController
             . view('generic/foot');
     }
 
+    public function opex()
+    {
+        $points_model = model(PointsModel::class);
+
+        $members = $points_model->get_active_members_by_troop($points_model->get_active_members());
+
+        return view('generic/head')
+            . view('generic/header')
+            . view('opex', ['members' => $members])
+            . view('generic/footer')
+            . view('generic/foot');
+    }
+
     public function warning()
     {
         $points_model = model(PointsModel::class);

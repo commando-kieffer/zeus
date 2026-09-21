@@ -1,11 +1,7 @@
 <main class="training">
-    <form action="/points/add_correct_point" method="post" class="training-form">
+    <form action="/points/add_opex" method="post" class="training-form">
         <div class="tf-head">
-            <h1>Corriger des points</h1>
-        </div>
-        <div class="motif-field">
-            <label for="motif">Motif</label>
-            <input type="text" name="motif" id="motif" maxlength="256" placeholder="Raison de la correction" required>
+            <h1>Attribuer des points OPEX</h1>
         </div>
         <div class="tf-content">
             <?php foreach ($members as $troop) { if(!empty($troop['members'])) { ?>
@@ -15,13 +11,13 @@
                     <tr>
                         <th>Nom</th>
                         <th>Grade</th>
-                        <th>Présence</th>
+                        <th>OPEX</th>
                     </tr>
                     <?php foreach($troop['members'] as $member) { ?>
                     <tr class="tfcc-member">
                         <td><?php echo $member->username ?></td>
                         <td><img src="/pictures/jackets/<?php echo $member->user_group_id ?>.png" alt=""></td>
-                        <td><input name="<?php echo $member->user_id ?>" value="0" type="number"></td>
+                        <td><input name="<?php echo $member->user_id ?>" type="checkbox"></td>
                     </tr>
                     <?php } ?>
                 </table>
@@ -29,7 +25,7 @@
             <?php }} ?>
         </div>
         <div class="tf-foot">
-            <button type="submit" class="outline-btn-inverse">ENVOYER LES MODIFICATIONS</button>
+            <button type="submit" class="outline-btn-inverse">ENVOYER LES POINTS</button>
         </div>
     </form>
 </main>

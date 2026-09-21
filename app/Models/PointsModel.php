@@ -10,6 +10,9 @@ class PointsModel extends Model
     /** Points accordés à un membre pour son travail dans un métier. */
     public const WORK_POINTS = 25;
 
+    /** Points accordés à un membre pour sa participation à une OPEX. */
+    public const OPEX_POINTS = 25;
+
     public function __construct()
     {
         parent::__construct();
@@ -213,19 +216,20 @@ class PointsModel extends Model
         ]);
     }
 
-    public function set_point($value, $member_id)
+    public function set_point($value, $member_id, ?string $message = null)
     {
         if ($value == 0) return;
 
         $query = "UPDATE xf_user SET panel_pts = panel_pts + ? WHERE user_id = ?";
         $this->db->query($query, array($value, $member_id));
 
-        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
         $this->db->query($query, [
             $member_id,
             PointsCategoryModel::Correction->value,
             $value,
-            session("user")["user_id"]
+            session("user")["user_id"],
+            $message
         ]);
     }
 
@@ -276,6 +280,28 @@ class PointsModel extends Model
             self::WORK_POINTS,
             session("user")["user_id"],
             $job_title === null ? null : mb_substr($job_title, 0, 256)
+        ]);
+    }
+
+    /**
+     * Récompense la participation d'un membre à une OPEX (opération
+     * extérieure : match ou tournoi). Incrémente panel_opex en plus des
+     * points, sans quoi le classement et les décorations automatiques basés
+     * sur ce compteur resteraient figés à leur valeur reprise lors de la
+     * migration.
+     */
+    public function set_opex($member_id)
+    {
+        $query = "UPDATE xf_user SET panel_pts = panel_pts + ?, panel_opex = panel_opex + 1 WHERE user_id = ?";
+        $this->db->query($query, array(self::OPEX_POINTS, $member_id));
+
+        $query = "INSERT INTO panel_points_hist (user_id, category_id, points, given_by, message) VALUES (?, ?, ?, ?, ?)";
+        $this->db->query($query, [
+            $member_id,
+            PointsCategoryModel::Opex->value,
+            self::OPEX_POINTS,
+            session("user")["user_id"],
+            'Participation à une OPEX'
         ]);
     }
 

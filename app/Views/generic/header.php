@@ -66,6 +66,7 @@
             <li><a href="/points/blame">Blâme</a></li>
             <li><a href="/points/warning">Avertissement</a></li>
             <li><a href="/points/correct_point">Correction de points</a></li>
+            <li><a href="/points/opex">OPEX</a></li>
             <?php } ?>
         </ul>
     </nav>

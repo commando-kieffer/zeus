@@ -26,6 +26,9 @@ class Training extends BaseController
 
         $active_members = $points_model->get_active_members();
 
+        $motif = trim($_POST['motif'] ?? '');
+        $message = $motif === '' ? null : mb_substr($motif, 0, 256);
+
         foreach($active_members as $member) {
           if (!isset($_POST[$member->user_id])) continue;
 
@@ -34,8 +37,22 @@ class Training extends BaseController
 
           $points = intval($points);
           if ($points === 0) continue;
-    
-          $points_model->set_point($points, $member->user_id);
+
+          $points_model->set_point($points, $member->user_id, $message);
+        }
+
+        return redirect('operation_success');
+    }
+
+    public function add_opex()
+    {
+        $points_model = model(PointsModel::class);
+
+        $active_members = $points_model->get_active_members();
+
+        foreach($active_members as $member) {
+            if (isset($_POST[$member->user_id]))
+                $points_model->set_opex($member->user_id);
         }
 
         return redirect('operation_success');
