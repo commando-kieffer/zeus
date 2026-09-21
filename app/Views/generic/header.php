@@ -31,15 +31,15 @@
             <li>
                 <p id="tools-menu">Outils</p>
             </li>
+            <li>
+                <p id="medals-menu">Décorations</p>
+            </li>
             <?php if (session("user")['is_staff'] || can_award_job_points($current_user)) { ?>
                 <li>
                     <p id="points">Points</p>
                 </li>
             <?php } ?>
             <?php if (is_team_leader($current_user)) { ?>
-                <li>
-                    <p id="medals-menu">Décorations</p>
-                </li>
                 <li><a href="/statistiques">Statistiques</a></li>
                 <li><a href="/coffre">Coffre</a></li>
                 <li>
@@ -74,13 +74,15 @@
         </ul>
     </nav>
     <?php } ?>
-    <?php if (is_team_leader($current_user)) { ?>
     <nav class="sub sub-medals">
         <ul>
             <li><a href="/medals/liste">Liste</a></li>
+            <?php if (is_team_leader($current_user)) { ?>
             <li><a href="/medals">Attribution</a></li>
+            <?php } ?>
         </ul>
     </nav>
+    <?php if (is_team_leader($current_user)) { ?>
     <nav class="sub sub-upload">
         <ul>
             <li><a href="/upload/galerie">Upload galerie</a></li>

@@ -84,10 +84,6 @@ class Medal extends BaseController
      */
     public function catalogue()
     {
-        if (!is_team_leader(session('user'))) {
-            return $this->render_message("Vous n'avez pas la permission d'accéder à cette page.");
-        }
-
         return view('generic/head')
             . view('generic/header')
             . view('medal_list', ['all_medals' => model(MedalModel::class)->get_all_medals()])
