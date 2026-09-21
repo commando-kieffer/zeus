@@ -43,6 +43,21 @@ class Medal extends BaseController
         return $date->format('Y-m-d');
     }
 
+    /**
+     * Date du prochain vendredi, aujourd'hui inclus (format Y-m-d) : date par
+     * défaut du bouton "Attribuer" de la liste "À attribuer", qui enregistre
+     * l'attribution pour la remise à venir plutôt que pour la dernière déjà
+     * passée (default_medal_date(), utilisée elle pour la date pré-remplie
+     * de la modale "Gérer", où l'on log le plus souvent une remise passée).
+     */
+    private function next_medal_date(): string
+    {
+        $date = new \DateTime('today');
+        $offset = (5 - (int) $date->format('N') + 7) % 7; // N : 1 (lun.) .. 7 (dim.), vendredi = 5
+        $date->modify('+' . $offset . ' days');
+        return $date->format('Y-m-d');
+    }
+
     public function index()
     {
         if (!is_team_leader(session('user'))) {
@@ -72,6 +87,7 @@ class Medal extends BaseController
                 'medals_by_member' => $medals_by_member,
                 'pending_awards' => $medal_model->get_pending_awards($all_medals),
                 'default_medal_date' => $this->default_medal_date(),
+                'next_medal_date' => $this->next_medal_date(),
             ])
             . view('generic/footer')
             . view('generic/foot');

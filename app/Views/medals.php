@@ -33,7 +33,7 @@
                     <form action="/medals/toggle" method="post" class="pending-form">
                         <input type="hidden" name="member_id" value="<?php echo (int) $award['member']->user_id ?>">
                         <input type="hidden" name="medal_id" value="<?php echo (int) $award['medal']->id ?>">
-                        <input type="hidden" name="medal_date" value="<?php echo esc($default_medal_date) ?>">
+                        <input type="hidden" name="medal_date" value="<?php echo esc($next_medal_date) ?>">
                         <button type="button" class="outline-btn-inverse pending-ask">Attribuer</button>
                         <span class="pending-confirm" hidden>
                             <button type="submit" class="outline-btn-inverse pending-yes" title="Confirmer l'attribution">&#10003;</button>
