@@ -28,6 +28,9 @@
                 <p id="operations-menu">Opérations</p>
             </li>
             <li><a href="/classements">Classements</a></li>
+            <li>
+                <p id="tools-menu">Outils</p>
+            </li>
             <?php if (session("user")['is_staff'] || can_award_job_points($current_user)) { ?>
                 <li>
                     <p id="points">Points</p>
@@ -85,6 +88,12 @@
         </ul>
     </nav>
     <?php } ?>
+    <nav class="sub sub-tools">
+        <ul>
+            <li><a href="/outils/tirage-au-sort">Tirage au sort</a></li>
+            <li><a href="/outils/formation-equipes">Formation d'équipes</a></li>
+        </ul>
+    </nav>
 </header>
 
 <script>
@@ -108,4 +117,5 @@
     toggleSubMenu("points", ".sub-points");
     toggleSubMenu("medals-menu", ".sub-medals");
     toggleSubMenu("upload-menu", ".sub-upload");
+    toggleSubMenu("tools-menu", ".sub-tools");
 </script>

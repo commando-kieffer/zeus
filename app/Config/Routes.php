@@ -37,6 +37,8 @@ $routes->get('/medals/liste', 'Medal::catalogue');
 $routes->get('/classements', 'Ranking::index');
 $routes->get('/statistiques', 'Statistics::index');
 $routes->get('/coffre', 'Vault::index');
+$routes->get('/outils/tirage-au-sort', 'Tools::raffle');
+$routes->get('/outils/formation-equipes', 'Tools::teams');
 
 $routes->post('/login', 'Login::api_login');
 $routes->post('/points/add_correct_point', 'Training::add_correct_point');
@@ -58,4 +60,6 @@ $routes->post('/coffre/decrypt', 'Vault::decrypt');
 $routes->post('/coffre/update', 'Vault::update');
 $routes->post('/coffre/report_failure', 'Vault::report_failure');
 $routes->post('/coffre/report_success', 'Vault::report_success');
+$routes->post('/outils/tirage-au-sort', 'Tools::draw_raffle');
+$routes->post('/outils/formation-equipes', 'Tools::form_teams');
 

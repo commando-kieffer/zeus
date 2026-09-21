@@ -140,14 +140,10 @@ class ProfileModel extends Model
         return $bordee;
     }
 
-    public function extract_spe($secondary_group_ids) {
-        $spe_ref_id = [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 47, 51, 63];
+    public const SPE_REF_ID = [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 47, 51, 63];
 
-        foreach ($secondary_group_ids as $group_id) {
-            if (in_array($group_id, $spe_ref_id)) {
-                $spe_id = $group_id;
-            }
-        }
+    public function extract_spe($secondary_group_ids) {
+        $spe_id = $this->extract_spe_id($secondary_group_ids);
 
         $query = "SELECT title FROM xf_user_group WHERE user_group_id = ?";
         $result = $this->db->query($query, array($spe_id));
@@ -158,6 +154,50 @@ class ProfileModel extends Model
         ];
 
         return $spe;
+    }
+
+    /**
+     * Identifiant de spécialité (cf. SPE_REF_ID) sans requête en base, utile
+     * pour traiter la spécialité de nombreux membres sans une requête par
+     * membre (voir extract_spe, qui reste la version avec libellé pour la
+     * page de profil, où un seul membre est concerné à la fois).
+     */
+    public function extract_spe_id($secondary_group_ids): ?int {
+        if (is_string($secondary_group_ids)) {
+            $secondary_group_ids = explode(',', $secondary_group_ids);
+        }
+
+        $spe_id = null;
+        foreach ($secondary_group_ids as $group_id) {
+            if (in_array((int) $group_id, self::SPE_REF_ID, true)) {
+                $spe_id = (int) $group_id;
+            }
+        }
+
+        return $spe_id;
+    }
+
+    /**
+     * Libellés (xf_user_group.title) d'un ensemble de group_id, en une seule
+     * requête : utile partout où plusieurs membres doivent être annotés sans
+     * répéter une requête par membre (contrairement à get_profil_title, qui
+     * ne traite qu'un seul group_id, pour la page de profil).
+     *
+     * @return array<int, string> group_id => title
+     */
+    public function get_group_titles(array $group_ids): array {
+        if (empty($group_ids)) return [];
+
+        $placeholders = implode(',', array_fill(0, count($group_ids), '?'));
+        $query = "SELECT user_group_id, title FROM xf_user_group WHERE user_group_id IN ($placeholders)";
+        $result = $this->db->query($query, $group_ids);
+
+        $titles = [];
+        foreach ($result->getResult() as $row) {
+            $titles[(int) $row->user_group_id] = $row->title;
+        }
+
+        return $titles;
     }
 
     public function extract_metier($secondary_group_ids) {

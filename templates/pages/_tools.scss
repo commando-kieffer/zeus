@@ -1,0 +1,204 @@
+// Outils : tirage au sort et formation d'équipes. Réutilise la mise en page
+// des formulaires .training/.tfc-container (voir _training.scss et
+// _member_table.scss) ; ce fichier ne couvre que ce qui leur est propre.
+
+.raffle, .team-formation {
+    .tf-field {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+
+        span {
+            font-family: 'SpectralLight';
+            font-size: 13px;
+        }
+
+        input {
+            width: 8rem;
+            text-align: center;
+        }
+    }
+
+    .tf-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: 'SpectralLight';
+        font-size: 13px;
+        align-self: center;
+    }
+
+    .troop-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        cursor: pointer;
+        width: fit-content;
+    }
+
+    .tf-results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem 1rem 0;
+
+        h2 {
+            font-family: 'MarianneBold';
+            font-size: 28px;
+            padding-bottom: 1.5rem;
+            text-align: center;
+        }
+    }
+}
+
+.raffle {
+    // Troop décochée : conservée à l'écran (pas de saut de mise en page au
+    // clic) mais visuellement écartée du tirage.
+    .tfc-container:has(.troop-toggle input:not(:checked)) {
+        opacity: 0.45;
+    }
+
+    .multiplier-input {
+        width: 70px;
+        text-align: center;
+        padding: 0.4rem 0.5rem;
+    }
+
+    .raffle-rounds {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        gap: 1.5rem;
+        max-width: 95vw;
+    }
+
+    .raffle-round {
+        min-width: 220px;
+        border-radius: $radius-lg;
+        padding: 1.25rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        box-shadow: $shadow-card;
+
+        h3 {
+            font-family: 'MarianneBold';
+            font-size: 16px;
+            padding-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0;
+
+            &:not(:last-child) {
+                border-bottom: 1px solid rgba(15, 14, 51, 0.08);
+            }
+
+            img {
+                height: 32px;
+                border-radius: $radius-sm;
+            }
+
+            .raffle-name {
+                font-family: 'MarianneThin';
+                font-size: 14px;
+                flex: 1;
+            }
+
+            .badge {
+                font-size: 11px;
+                padding: 0.3rem 0.7rem;
+            }
+        }
+    }
+}
+
+.team-formation {
+    // Membre décoché : conservé à l'écran, mais visuellement écarté de
+    // l'équipe à venir (même traitement que .raffle pour une troop décochée).
+    .tfcc-member:has(.member-checkbox:not(:checked)) {
+        opacity: 0.4;
+    }
+
+    .teams-grid {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        gap: 1.5rem;
+        max-width: 95vw;
+    }
+
+    .team-card {
+        min-width: 260px;
+        border-radius: $radius-lg;
+        padding: 1.25rem 1.5rem;
+        background-color: rgba(255, 255, 255, 0.6);
+        box-shadow: $shadow-card;
+
+        h3 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: 'MarianneBold';
+            font-size: 16px;
+            padding-bottom: 0.75rem;
+
+            .team-count {
+                font-family: 'SpectralLight';
+                font-size: 12px;
+                opacity: 0.6;
+            }
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.4rem 0;
+
+            &:not(:last-child) {
+                border-bottom: 1px solid rgba(15, 14, 51, 0.08);
+            }
+
+            // Titre de catégorie (État-Major / Quartier-Maîtres / Reste de
+            // l'équipage), posé par team_formation.php avant le premier
+            // membre de chaque grade — les membres arrivent déjà triés dans
+            // cet ordre, voir ToolsModel::form_teams().
+            &.team-rank-title {
+                display: block;
+                text-align: center;
+                padding: 0.9rem 0 0.35rem;
+                font-family: 'MarianneBold';
+                font-size: 11px;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                color: rgba(15, 14, 51, 0.5);
+                border-bottom: none;
+
+                &:first-child {
+                    padding-top: 0;
+                }
+            }
+
+            img {
+                height: 32px;
+                border-radius: $radius-sm;
+            }
+
+            .team-member-name {
+                font-family: 'MarianneThin';
+                font-size: 14px;
+            }
+
+            .badge {
+                font-size: 11px;
+                padding: 0.3rem 0.7rem;
+            }
+        }
+    }
+}
