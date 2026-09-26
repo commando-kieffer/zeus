@@ -10,9 +10,18 @@ use \App\Models\OperationModel;
 use \App\Models\OperationVoteModel;
 use \App\Models\PanelUserModel;
 use \App\Models\MetierModel;
+use \App\Models\StatisticsModel;
 
 class Home extends BaseController
 {
+    /**
+     * Étendue maximale, en années, de la période du graphique de présences.
+     * Ce graphique est visible de tous les membres avec des dates libres : sans
+     * borne, une période de plusieurs siècles produirait des dizaines de
+     * milliers de points à calculer et à envoyer au navigateur.
+     */
+    private const PRESENCE_MAX_YEARS = 10;
+
     public function __construct()
     {
         if (!session('is_logged_in')) {
@@ -24,6 +33,7 @@ class Home extends BaseController
 
         helper('date');
         helper('job_points');
+        helper('period');
     }
 
     public function index(): string
@@ -131,6 +141,7 @@ class Home extends BaseController
                 'is_own_profile' => $is_own_profile,
                 'user' => $user,
                 'profil' => $profil,
+                'presence' => $this->presence_history((int) $user['user_id']),
                 'points_history' => $points_history,
                 'history_page' => $history_page,
                 'history_page_count' => $history_page_count,
@@ -142,6 +153,58 @@ class Home extends BaseController
             ])
             . view('generic/footer')
             . view('generic/foot');
+    }
+
+    /**
+     * Données du graphique "Historique des présences" d'un profil, pour la
+     * période et l'intervalle demandés dans l'URL (presence_start,
+     * presence_end, presence_granularity) : la dernière année par semaine
+     * quand rien n'est demandé, ou quand une valeur est invalide.
+     *
+     * "query" reprend les paramètres du graphique quand l'URL en contenait,
+     * pour que la pagination de l'historique des points ne les remette pas à
+     * zéro en changeant de page.
+     */
+    private function presence_history(int $user_id): array
+    {
+        // Jour de Paris, comme le reste de l'application : le serveur tourne
+        // en UTC, et juste après minuit à Paris la date UTC a un jour de retard.
+        $today = new \DateTime('today', new \DateTimeZone('Europe/Paris'));
+
+        $start = parse_period_date($_GET['presence_start'] ?? null) ?? (clone $today)->modify('-1 year')->format('Y-m-d');
+        $end = parse_period_date($_GET['presence_end'] ?? null) ?? $today->format('Y-m-d');
+        if ($start > $end) {
+            [$start, $end] = [$end, $start];
+        }
+
+        $earliest_start = (new \DateTime($end))->modify('-' . self::PRESENCE_MAX_YEARS . ' years')->format('Y-m-d');
+        $start = max($start, $earliest_start);
+
+        // Une opération par semaine au plus : un intervalle d'un jour n'aurait
+        // aucun sens (comme pour le taux de présence des statistiques).
+        $granularity = parse_period_granularity($_GET['presence_granularity'] ?? null, ['week', 'month'], 'week');
+
+        $points = StatisticsModel::build_member_presence_series(
+            model(StatisticsModel::class)->get_member_presence($user_id, $start, $end),
+            $start,
+            $end,
+            $granularity
+        );
+
+        $is_filtered = isset($_GET['presence_start']) || isset($_GET['presence_end']) || isset($_GET['presence_granularity']);
+
+        return [
+            'start' => $start,
+            'end' => $end,
+            'granularity' => $granularity,
+            'points' => $points,
+            'has_data' => array_sum(array_column($points, 'reported')) > 0,
+            'query' => $is_filtered ? [
+                'presence_start' => $start,
+                'presence_end' => $end,
+                'presence_granularity' => $granularity,
+            ] : [],
+        ];
     }
 
     /**

@@ -16,6 +16,8 @@ class Statistics extends BaseController
             throw new RedirectException('login');
             exit;
         }
+
+        helper('period');
     }
 
     private function render_message(string $message): string
@@ -25,93 +27,6 @@ class Statistics extends BaseController
             . view('404', ['message' => $message])
             . view('generic/footer')
             . view('generic/foot');
-    }
-
-    /**
-     * Date au format Y-m-d (et calendaire valide), sinon null.
-     */
-    private function parse_date(?string $date): ?string
-    {
-        if ($date === null) {
-            return null;
-        }
-
-        $parsed = \DateTime::createFromFormat('Y-m-d', $date);
-
-        return ($parsed !== false && $parsed->format('Y-m-d') === $date) ? $date : null;
-    }
-
-    /**
-     * Granularité demandée si elle fait partie des valeurs autorisées pour
-     * ce graphique, sinon $default. $default est aussi ce qui s'applique
-     * quand aucune granularité n'est fournie (une semaine plutôt qu'un jour :
-     * un jour par point est trop fin dès que la période dépasse quelques
-     * semaines).
-     *
-     * @param array<int, string> $allowed
-     */
-    private function parse_granularity(?string $granularity, array $allowed, string $default): string
-    {
-        return in_array($granularity, $allowed, true) ? $granularity : $default;
-    }
-
-    /**
-     * Liste ordonnée des clés de buckets (une par point de courbe, au format
-     * Y-m-d) couvrant [start_date, end_date] pour la granularité donnée. Le
-     * dernier bucket peut couvrir une plage plus courte si la période ne se
-     * découpe pas en un nombre entier de points.
-     *
-     * "month" avance de mois calendaire en mois calendaire (une clé est le
-     * 1er du mois) plutôt que par tranches de 30 jours : les mois n'ont pas
-     * tous la même longueur, et des tranches fixes finiraient par dériver
-     * des vrais débuts de mois.
-     */
-    private function build_buckets(\DateTime $start_date, \DateTime $end_date, string $granularity): array
-    {
-        $buckets = [];
-
-        if ($granularity === 'month') {
-            $cursor = new \DateTime($start_date->format('Y-m-01'));
-            $end_month = new \DateTime($end_date->format('Y-m-01'));
-            while ($cursor <= $end_month) {
-                $buckets[] = $cursor->format('Y-m-d');
-                $cursor->modify('+1 month');
-            }
-
-            return $buckets;
-        }
-
-        $bucket_days = $granularity === 'week' ? 7 : 1;
-        $cursor = clone $start_date;
-        while ($cursor <= $end_date) {
-            $buckets[] = $cursor->format('Y-m-d');
-            $cursor->modify('+' . $bucket_days . ' days');
-        }
-
-        return $buckets;
-    }
-
-    /**
-     * Clé du bucket (parmi celles retournées par build_buckets pour les
-     * mêmes $start_date/$granularity) auquel appartient $row_date.
-     *
-     * @param array<int, string> $buckets
-     */
-    private function bucket_key(array $buckets, \DateTime $start_date, \DateTime $row_date, string $granularity): string
-    {
-        if ($granularity === 'month') {
-            $months = ((int) $row_date->format('Y') - (int) $start_date->format('Y')) * 12
-                + ((int) $row_date->format('n') - (int) $start_date->format('n'));
-            $index = max(0, min($months, count($buckets) - 1));
-
-            return $buckets[$index];
-        }
-
-        $bucket_days = $granularity === 'week' ? 7 : 1;
-        $days_since_start = (int) $start_date->diff($row_date)->days;
-        $index = max(0, min(intdiv($days_since_start, $bucket_days), count($buckets) - 1));
-
-        return $buckets[$index];
     }
 
     public function index()
@@ -124,18 +39,18 @@ class Statistics extends BaseController
         $default_end = $today->format('Y-m-d');
         $default_start = (clone $today)->modify('-29 days')->format('Y-m-d');
 
-        $start = $this->parse_date($_GET['start'] ?? null) ?? $default_start;
-        $end = $this->parse_date($_GET['end'] ?? null) ?? $default_end;
+        $start = parse_period_date($_GET['start'] ?? null) ?? $default_start;
+        $end = parse_period_date($_GET['end'] ?? null) ?? $default_end;
         if ($start > $end) {
             [$start, $end] = [$end, $start];
         }
 
-        $granularity = $this->parse_granularity($_GET['granularity'] ?? null, ['day', 'week', 'month'], 'week');
+        $granularity = parse_period_granularity($_GET['granularity'] ?? null, ['day', 'week', 'month'], 'week');
         // Les opérations n'ont lieu qu'une fois par semaine : un intervalle
         // d'un jour n'aurait aucun sens pour le taux de présence, d'où une
         // liste de granularités autorisées plus courte que celle du
         // graphique des arrivées.
-        $presence_granularity = $this->parse_granularity($_GET['presence_granularity'] ?? null, ['week', 'month'], 'week');
+        $presence_granularity = parse_period_granularity($_GET['presence_granularity'] ?? null, ['week', 'month'], 'week');
 
         // Toute la période, un point par bucket à partir du début de la
         // période, y compris les buckets sans aucune arrivée (comptés à 0) :
@@ -144,7 +59,7 @@ class Statistics extends BaseController
         $start_date = new \DateTime($start);
         $end_date = new \DateTime($end);
 
-        $buckets = $this->build_buckets($start_date, $end_date, $granularity);
+        $buckets = build_period_buckets($start_date, $end_date, $granularity);
 
         $series_by_troop = [];
         foreach (StatisticsModel::TROOPS as $troop_id => $troop) {
@@ -157,7 +72,7 @@ class Statistics extends BaseController
 
         $stats_model = model(StatisticsModel::class);
         foreach ($stats_model->get_new_joiners($start, $end) as $row) {
-            $bucket_key = $this->bucket_key($buckets, $start_date, new \DateTime($row->join_date), $granularity);
+            $bucket_key = period_bucket_key($buckets, $start_date, new \DateTime($row->join_date), $granularity);
 
             // Toute arrivée compte dans le total, qu'elle ait ou non gardé
             // une troop reconnue depuis (un départ ne doit pas la faire
@@ -177,7 +92,7 @@ class Statistics extends BaseController
         // présence des opérations (une ligne operation_report par membre
         // rapporté). La troop retenue est celle figée sur le rapport, pas
         // l'appartenance actuelle du membre.
-        $presence_buckets = $this->build_buckets($start_date, $end_date, $presence_granularity);
+        $presence_buckets = build_period_buckets($start_date, $end_date, $presence_granularity);
 
         $presence_present = [];
         $presence_reported = [];
@@ -189,7 +104,7 @@ class Statistics extends BaseController
         $presence_reported_total = array_fill_keys($presence_buckets, 0);
 
         foreach ($stats_model->get_operation_presence($start, $end) as $row) {
-            $bucket_key = $this->bucket_key($presence_buckets, $start_date, new \DateTime($row->op_date), $presence_granularity);
+            $bucket_key = period_bucket_key($presence_buckets, $start_date, new \DateTime($row->op_date), $presence_granularity);
 
             $presence_reported_total[$bucket_key]++;
             if ($row->status === 'present') {

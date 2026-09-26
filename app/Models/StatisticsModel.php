@@ -88,6 +88,78 @@ class StatisticsModel extends Model
     }
 
     /**
+     * Une ligne par présence rapportée (operation_report) pour un membre, sur
+     * les opérations dont la date tombe dans [start, end] (bornes incluses,
+     * dates au format Y-m-d), de la plus ancienne à la plus récente. Un
+     * membre sans rapport pour une opération n'y apparaît pas : rien n'y
+     * distingue "absent" de "pas concerné" tant qu'aucun rapport n'a été
+     * rempli.
+     *
+     * @return array<int, object{op_date: string, status: string}>
+     */
+    public function get_member_presence(int $member_id, string $start, string $end): array
+    {
+        $query = "SELECT o.date AS op_date, r.status
+            FROM operation_report r
+            INNER JOIN operation o ON o.id = r.operation_id
+            WHERE r.member_id = ? AND o.date BETWEEN ? AND ?
+            ORDER BY o.date ASC";
+
+        return $this->db->query($query, [$member_id, $start, $end])->getResult();
+    }
+
+    /**
+     * Série de présence d'un membre pour le graphique du profil : un point par
+     * intervalle de la période [start, end], y compris ceux sans aucun rapport,
+     * pour que la courbe ne saute pas d'un point à l'autre.
+     *
+     * "value" vaut null s'il n'y a eu aucun rapport dans l'intervalle (trou
+     * dans la courbe, à ne pas confondre avec une absence). Sinon :
+     *  - par semaine (une opération par semaine au plus) elle est binaire :
+     *    1 si le membre a été présent, 0 s'il n'a été rapporté qu'absent
+     *    (justifié ou non) ;
+     *  - par mois elle est le taux de présence de l'intervalle, entre 0 et 1
+     *    (présences / opérations rapportées), un mois regroupant plusieurs
+     *    opérations.
+     * "present" et "reported" gardent le détail pour l'afficher.
+     *
+     * @param array<int, object{op_date: string, status: string}> $rows lignes de get_member_presence()
+     * @return array<int, array{bucket: string, present: int, reported: int, value: ?int}>
+     */
+    public static function build_member_presence_series(array $rows, string $start, string $end, string $granularity): array
+    {
+        helper('period');
+
+        $start_date = new \DateTime($start);
+        $buckets = build_period_buckets($start_date, new \DateTime($end), $granularity);
+
+        $points = [];
+        foreach ($buckets as $bucket) {
+            $points[$bucket] = ['bucket' => $bucket, 'present' => 0, 'reported' => 0, 'value' => null];
+        }
+
+        foreach ($rows as $row) {
+            $key = period_bucket_key($buckets, $start_date, new \DateTime($row->op_date), $granularity);
+
+            $points[$key]['reported']++;
+            if ($row->status === 'present') {
+                $points[$key]['present']++;
+            }
+        }
+
+        foreach ($points as &$point) {
+            if ($point['reported'] > 0) {
+                $point['value'] = $granularity === 'month'
+                    ? round($point['present'] / $point['reported'], 4)
+                    : ($point['present'] > 0 ? 1 : 0);
+            }
+        }
+        unset($point);
+
+        return array_values($points);
+    }
+
+    /**
      * Couleurs des plateformes du graphique de répartition.
      */
     public const PLATFORM_COLORS = [
