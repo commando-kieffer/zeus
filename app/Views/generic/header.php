@@ -27,6 +27,7 @@
             <li>
                 <p id="operations-menu">Opérations</p>
             </li>
+            <li><a href="/documents">Documents</a></li>
             <li><a href="/classements">Classements</a></li>
             <li>
                 <p id="tools-menu">Outils</p>

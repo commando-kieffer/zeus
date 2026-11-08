@@ -46,6 +46,17 @@ if (!function_exists('can_create_operations')) {
 }
 
 /**
+ * Peut ajouter, modifier et supprimer des documents de la bibliothèque
+ * (/documents) : état-major. Tous les membres connectés peuvent les consulter.
+ */
+if (!function_exists('can_manage_documents')) {
+    function can_manage_documents(array $user): bool
+    {
+        return is_team_leader($user);
+    }
+}
+
+/**
  * Peut rédiger un rapport de présence pour sa troop et consulter le rapport
  * complet d'une opération : chefs de troop et état-major.
  */

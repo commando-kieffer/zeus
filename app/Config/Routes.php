@@ -39,6 +39,11 @@ $routes->get('/statistiques', 'Statistics::index');
 $routes->get('/coffre', 'Vault::index');
 $routes->get('/outils/tirage-au-sort', 'Tools::raffle');
 $routes->get('/outils/formation-equipes', 'Tools::teams');
+$routes->get('/documents', 'Documents::index');
+$routes->get('/documents/ajouter', 'Documents::create');
+$routes->get('/documents/(:num)/modifier', 'Documents::edit/$1');
+$routes->get('/documents/(:num)/fichier', 'Documents::file/$1');
+$routes->get('/documents/(:num)/apercu', 'Documents::preview/$1');
 
 $routes->post('/login', 'Login::api_login');
 $routes->post('/points/add_correct_point', 'Training::add_correct_point');
@@ -62,4 +67,7 @@ $routes->post('/coffre/report_failure', 'Vault::report_failure');
 $routes->post('/coffre/report_success', 'Vault::report_success');
 $routes->post('/outils/tirage-au-sort', 'Tools::draw_raffle');
 $routes->post('/outils/formation-equipes', 'Tools::form_teams');
+$routes->post('/documents/ajouter', 'Documents::store');
+$routes->post('/documents/(:num)/modifier', 'Documents::update/$1');
+$routes->post('/documents/(:num)/supprimer', 'Documents::delete/$1');
 

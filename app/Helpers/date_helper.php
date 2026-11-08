@@ -12,6 +12,23 @@ if (!function_exists('format_date_fr')) {
     }
 }
 
+if (!function_exists('format_utc_date_fr')) {
+    /**
+     * Formate un horodatage UTC de la base de données (ex. : 2026-11-07
+     * 23:30:00, tel que stocké par created_at / updated_at) en date française
+     * jour/mois/année, à l'heure de Paris (ex. : 08/11/2026).
+     *
+     * La conversion compte : un document ajouté à 23h30 UTC l'a été après
+     * minuit à Paris et doit porter la date du lendemain.
+     */
+    function format_utc_date_fr(string $utc_datetime): string
+    {
+        return (new DateTime($utc_datetime, new DateTimeZone('UTC')))
+            ->setTimezone(new DateTimeZone('Europe/Paris'))
+            ->format('d/m/Y');
+    }
+}
+
 if (!function_exists('is_operation_done')) {
     /**
      * Une opération est considérée comme terminée à partir de 21h (heure de
